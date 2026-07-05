@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="AUTOP - Demande de devis pour pièces automobiles. Rapide, sécurisé, suivi en temps réel.">
+  <meta name="keywords" content="AUTOP, pièces auto, devis, automobile, Tunisie">
+  <title>AUTOP — Demande de devis</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- TOP BAR WITH PHONES -->
+<div class="top-bar">
+  📞 <a href="tel:+21698774525">+216 98 774 525</a> | <a href="tel:+21698171411">+216 98 171 411</a> | 
+  <a href="mailto:comptoir.distribution@autop.tn">comptoir.distribution@autop.tn</a>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-text">
+        <div class="brand">AUTOP</div>
+        <div class="tagline">AUTomotive Premium</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="contact-icons">
+        <a href="mailto:comptoir.distribution@autop.tn" class="email" title="Email">📧</a>
+        <a href="https://wa.me/21698774525" target="_blank" class="whatsapp" title="WhatsApp">💬</a>
+      </div>
+      <nav class="nav-links">
+        <a href="admin.html">Espace Pro</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<!-- TRACKING SECTION -->
+<div class="tracking-section">
+  <div class="tracking-container">
+    <div class="tracking-box">
+      <h3>🔍 Suivi de votre devis</h3>
+      <input type="text" id="trackingInput" placeholder="Entrez votre numéro de devis (ex: DEM-20260701-001)">
+      <button class="search-btn" onclick="trackDevis()">Rechercher</button>
+    </div>
+    <div class="tracking-result" id="trackingResult">
+      <div class="tracking-box">
+        <h3>📊 Détails de votre devis</h3>
+        <div class="status-info">
+          <div class="status-label">État d'avancement</div>
+          <div class="status-value">
+            <span class="status-badge" id="resultStatus" style="display: inline-block;"></span>
+          </div>
+        </div>
+        <div class="status-info">
+          <div class="status-label">Date</div>
+          <div class="status-value" id="resultDate"></div>
+        </div>
+        <div class="status-info">
+          <div class="status-label">Nombre de pièces</div>
+          <div class="status-value" id="resultPieces"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Demande de Devis — Pièces Auto</h1>
+  <p>Rapide • Sécurisé • Suivi en temps réel</p>
+  <div class="trust-badges">
+    <div><span>✅ 100%</span> Gratuit</div>
+    <div><span>⚡ Réponse</span> en 2h</div>
+    <div><span>📞 Support</span> 24/7</div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="features">
+  <div class="feature">
+    <div class="feature-icon">⚡</div>
+    <h3>Rapide</h3>
+    <p>Remplissez en 2 min</p>
+  </div>
+  <div class="feature">
+    <div class="feature-icon">🔒</div>
+    <h3>Sécurisé</h3>
+    <p>Vos données protégées</p>
+  </div>
+  <div class="feature">
+    <div class="feature-icon">📞</div>
+    <h3>Support</h3>
+    <p>Contact immédiat</p>
+  </div>
+  <div class="feature">
+    <div class="feature-icon">💰</div>
+    <h3>Gratuit</h3>
+    <p>Aucun frais caché</p>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="container">
+  <form id="demandeForm" onsubmit="return submitDemande(event)">
+
+    <!-- INFORMATIONS CLIENT -->
+    <div class="form-group">
+      <h3 style="margin-bottom: 16px; color: #d32f2f;">📋 Vos informations</h3>
+      <div class="form-row">
+        <div>
+          <label for="nom" class="required">Nom complet</label>
+          <input type="text" id="nom" name="nom" required>
+        </div>
+        <div>
+          <label for="email" class="required">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div>
+          <label for="telephone" class="required">Téléphone</label>
+          <input type="tel" id="telephone" name="telephone" required>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFORMATIONS VÉHICULE -->
+    <div class="form-group">
+      <h3 style="margin-bottom: 16px; color: #d32f2f;">🚗 Informations du véhicule</h3>
+      <div class="form-row">
+        <div>
+          <label for="marque" class="required">Marque</label>
+          <input type="text" id="marque" name="marque" placeholder="ex: Renault" required>
+        </div>
+        <div>
+          <label for="modele" class="required">Modèle</label>
+          <input type="text" id="modele" name="modele" placeholder="ex: Clio" required>
+        </div>
+        <div>
+          <label for="annee" class="required">Année</label>
+          <input type="number" id="annee" name="annee" min="1990" max="2050" placeholder="ex: 2020" required>
+        </div>
+        <div>
+          <label for="kilometrage">Kilométrage</label>
+          <input type="number" id="kilometrage" name="kilometrage" placeholder="ex: 50000">
+        </div>
+      </div>
+    </div>
+
+    <!-- PIÈCES DEMANDÉES -->
+    <div class="pieces-section">
+      <h3>🔧 Pièces demandées</h3>
+      <div id="piecesContainer">
+        <div class="piece-row" data-piece-id="1">
+          <input type="text" class="piece-des" placeholder="Désignation de la pièce" required>
+          <input type="text" class="piece-ref" placeholder="Référence OEM">
+          <input type="number" class="piece-qte" placeholder="Quantité" value="1" min="1" required>
+          <select class="piece-urg">
+            <option value="Normal">Normal</option>
+            <option value="Urgent">Urgent ⚡</option>
+          </select>
+          <button type="button" class="btn-remove" onclick="removePiece(this)" style="opacity: 0; pointer-events: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+      </div>
+      <button type="button" class="btn-add-piece" onclick="addPiece()">+ Ajouter une pièce</button>
+    </div>
+
+    <!-- FILE UPLOAD SECTION -->
+    <div class="files-section">
+      <h3>📸 Photos et Documents (Optionnel)</h3>
+      <p>Téléchargez des photos ou documents pour faciliter le devis<br><small>(images, PDF, Word, etc.)</small></p>
+      <div class="file-input-wrapper">
+        <input type="file" id="fileInput" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleFileSelect(event)">
+        <button type="button" class="file-upload-btn" onclick="document.getElementById('fileInput').click()">
+          📁 Choisir des fichiers
+        </button>
+      </div>
+      <div class="max-files-info">Maximum 10 fichiers, 5 MB par fichier</div>
+      <div class="files-list" id="filesList"></div>
+    </div>
+
+    <!-- MESSAGE -->
+    <div class="form-group">
+      <label for="message">Message supplémentaire</label>
+      <textarea id="message" name="message" placeholder="Décrivez votre demande en détail..."></textarea>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="actions">
+      <button type="submit" class="btn btn-primary">📤 Envoyer mon devis</button>
+      <button type="reset" class="btn btn-outline">Réinitialiser</button>
+    </div>
+  </form>
+</div>
+
+<!-- CONFIRMATION -->
+<div class="confirmation" id="confirmation">
+  <div class="confirmation-content">
+    <h2>✅ Demande envoyée avec succès !</h2>
+    <p>Votre numéro de suivi :</p>
+    <div class="num" id="numDemande">DEM-20260705-001</div>
+    <p>Nous vous contacterons sous <strong>2 heures</strong> par email ou téléphone.</p>
+    <p style="color: #666; font-size: 13px; margin-top: 12px;">📱 Vous pouvez suivre votre demande en haut de cette page avec ce numéro.</p>
+
+    <div class="send-options">
+      <button class="btn btn-outline" id="btnEmailAutop">📧 Envoyer par email</button>
+      <button class="btn btn-outline" id="btnWhats1">💬 WhatsApp #1</button>
+      <button class="btn btn-outline" id="btnWhats2">💬 WhatsApp #2</button>
+    </div>
+
+    <div class="actions" style="justify-content: center; margin-top: 24px;">
+      <button class="btn btn-primary" onclick="nouvelleDemande()">Nouvelle demande</button>
+      <button class="btn btn-outline" onclick="window.location.href='admin.html'">Accès Espace Pro</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-content">
+    <p>AUTOP — Vente de pièces automobiles</p>
+    <div class="footer-links">
+      <a href="mailto:comptoir.distribution@autop.tn">📧 Email</a>
+      <a href="https://wa.me/21698774525">💬 WhatsApp</a>
+    </div>
+    <div class="footer-links" style="margin-top: 8px;">
+      <a href="admin.html">🔑 Accès espace professionnel</a>
+    </div>
+    <p style="margin-top: 16px; font-size: 12px; color: #888;">© 2026 AUTOP. Tous droits réservés.</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
