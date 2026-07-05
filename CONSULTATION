@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AUTOP — Demande de devis</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-card: #1e293b;
+      --bg-input: #0f172a;
+      --border: #334155;
+      --border-focus: #3b82f6;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* TOP BAR - PHONE NUMBERS */
+    .top-bar {
+      background: linear-gradient(90deg, #d32f2f 0%, #b71c1c 100%);
+      padding: 8px 24px;
+      text-align: center;
+      font-size: 13px;
+      color: white;
+    }
+    .top-bar a {
+      color: white;
+      text-decoration: none;
+      margin: 0 12px;
+      transition: opacity 0.2s;
+    }
+    .top-bar a:hover { opacity: 0.8; }
+
+    /* HEADER */
+    .header {
+      background: white;
+      border-bottom: 2px solid #d32f2f;
+      padding: 12px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo img { 
+      width: 140px; 
+      height: auto; 
+      display: block;
+      object-fit: contain;
+    }
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+    .logo-text .brand {
+      font-weight: 800;
+      font-size: 14px;
+      color: #d32f2f;
+    }
+    .logo-text .tagline {
+      font-size: 11px;
+      color: #555;
+      font-weight: 600;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .contact-icons {
+      display: flex;
+      gap: 12px;
+    }
+    .contact-icons a {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #d32f2f;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 18px;
+      transition: all 0.2s;
+    }
+    .contact-icons a:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(211, 47, 47, 0.4);
+    }
+    .email { color: white; }
+    .whatsapp { color: white; }
+
+    .nav-links a {
+      color: #333;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s;
+      border: 2px solid #d32f2f;
+      color: #d32f2f;
+    }
+    .nav-links a:hover { 
+      background: #d32f2f;
+      color: white;
+    }
+
+    /* TRACKING SECTION */
+    .tracking-section {
+      background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+      padding: 24px 0;
+      border-bottom: 1px solid #ffe0b2;
+    }
+    .tracking-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+    .tracking-box {
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .tracking-box h3 {
+      color: #d32f2f;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+    .tracking-box input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .tracking-box input:focus {
+      outline: none;
+      border-color: #d32f2f;
+      box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
+    }
+
+    .search-btn {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .search-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+    }
+
+    .tracking-result {
+      display: none;
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    .tracking-result.show {
+      display: block;
+    }
+
+    .status-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .status-info:last-child { border: none; }
+    .status-label {
+      color: #666;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    .status-value {
+      text-align: right;
+    }
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e8eef5 100%);
+      padding: 40px 24px;
+      text-align: center;
+      border-bottom: 2px solid #ddd;
+    }
+    .hero h1 { 
+      font-size: 36px; 
+      font-weight: 700; 
+      margin-bottom: 12px;
+      color: #d32f2f;
+    }
+    .hero p { 
+      color: #666; 
+      font-size: 14px; 
+      margin-bottom: 20px;
+    }
+
+    .trust-badges {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .trust-badge span {
+      color: #d32f2f;
+      font-weight: 700;
+    }
+
+    /* FEATURES */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 24px;
+    }
+    .feature {
+      text-align: center;
+      padding: 12px;
+    }
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #d32f2f, #b71c1c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+      margin: 0 auto 8px;
+    }
+    .feature h3 { color: #333; font-size: 14px; margin-bottom: 4px; }
+    .feature p { color: #999; font-size: 13px; }
+
+    /* FORM */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px 40px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .required::after {
+      content: ' *';
+      color: #d32f2f;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #d32f2f;
+      box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    /* PIECES */
+    .pieces-section {
+      background: #f5f5f5;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .pieces-section h3 {
+      margin-bottom: 16px;
+      font-size: 16px;
+      color: #d32f2f;
+    }
+    .piece-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 44px;
+      gap: 8px;
+      align-items: end;
+      margin-bottom: 12px;
+    }
+    .piece-des { grid-column: 1; }
+    .piece-ref { grid-column: 2; }
+    .piece-qte { grid-column: 3; }
+    .piece-urg { grid-column: 4; }
+
+    .btn-remove {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border: 1px solid #d32f2f;
+      border-radius: 6px;
+      background: rgba(211, 47, 47, 0.1);
+      color: #d32f2f;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .btn-remove:hover {
+      background: rgba(211, 47, 47, 0.2);
+    }
+    .btn-remove svg { display: block; }
+
+    .btn-add-piece {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #81c784;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-add-piece:hover {
+      background: #c8e6c9;
+    }
+
+    /* FILE UPLOAD SECTION */
+    .files-section {
+      background: #e3f2fd;
+      border: 2px dashed #1976d2;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .files-section h3 {
+      color: #1976d2;
+    }
+
+    .files-section p {
+      color: #666;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .file-input-wrapper input[type="file"] {
+      display: none;
+    }
+
+    .file-upload-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .file-upload-btn:hover {
+      background: #1565c0;
+      transform: translateY(-2px);
+    }
+
+    .files-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .file-item {
+      position: relative;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 8px;
+      text-align: center;
+      font-size: 11px;
+      color: #666;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .file-remove-btn {
+      position: absolute;
+      top: -6px;
+      right: 4px;
+      width: 20px;
+      height: 20px;
+      background: #d32f2f;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .file-item:hover .file-remove-btn {
+      opacity: 1;
+    }
+
+    .max-files-info {
+      color: #999;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    /* BUTTONS */
+    .actions {
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #d32f2f, #b71c1c);
+      color: white;
+      box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(211, 47, 47, 0.4);
+    }
+    .btn-outline {
+      border: 2px solid #ccc;
+      color: #333;
+      background: white;
+    }
+    .btn-outline:hover {
+      background: #f5f5f5;
+      border-color: #d32f2f;
+      color: #d32f2f;
+    }
+
+    /* CONFIRMATION */
+    .confirmation {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+    }
+    .confirmation.show {
+      display: flex;
+    }
+    .confirmation-content {
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+    .confirmation-content h2 {
+      color: #d32f2f;
+      margin-bottom: 12px;
+    }
+    .confirmation-content p {
+      color: #666;
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+    .num {
+      font-family: 'Courier New', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: #d32f2f;
+      background: #fff3e0;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 12px 0;
+      border: 2px solid #ff9800;
+    }
+
+    .send-options {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 12px;
+    }
+
+    /* FOOTER */
+    .footer {
+      background: #1a1a1a;
+      border-top: 2px solid #d32f2f;
+      padding: 32px 24px;
+      text-align: center;
+      color: #aaa;
+    }
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      color: #d32f2f;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .footer-links a:hover {
+      opacity: 0.8;
+      text-decoration: underline;
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      background: #d32f2f;
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s;
+      z-index: 2000;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .toast.success {
+      background: #4caf50;
+    }
+    .toast.error {
+      background: #d32f2f;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .top-bar {
+        font-size: 12px;
+      }
+      .top-bar a {
+        margin: 0 8px;
+      }
+      .header-inner {
+        flex-direction: column;
+        gap: 12px;
+      }
+      .header-right {
+        flex-direction: column;
+        gap: 12px;
+      }
+      .logo img {
+        width: 100px;
+      }
+      .contact-icons {
+        gap: 8px;
+      }
+      .contact-icons a {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+      }
+      .hero h1 {
+        font-size: 28px;
+      }
+      .piece-row {
+        grid-template-columns: 1fr;
+      }
+      .piece-des, .piece-ref, .piece-qte, .piece-urg, .btn-remove {
+        grid-column: 1 !important;
+      }
+      .trust-badges {
+        gap: 12px;
+      }
+      .tracking-container {
+        grid-template-columns: 1fr;
+      }
+      .files-list {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR WITH PHONES -->
+<div class="top-bar">
+  📞 <a href="tel:+21698774525">+216 98 774 525</a> | <a href="tel:+21698171411">+216 98 171 411</a> | 
+  <a href="mailto:comptoir.distribution@autop.tn">comptoir.distribution@autop.tn</a>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <svg width="140" height="80" viewBox="0 0 350 200" xmlns="http://www.w3.org/2000/svg">
+        <!-- AUTOP LOGO - Simplified version -->
+        <text x="175" y="120" font-size="90" font-weight="bold" text-anchor="middle" fill="#d32f2f" font-family="Arial">AUTOP</text>
+        <text x="175" y="155" font-size="16" text-anchor="middle" fill="#333" font-family="Arial" font-style="italic">AUTomotive Premium</text>
+        <circle cx="280" cy="80" r="25" fill="none" stroke="#d32f2f" stroke-width="2"/>
+        <line x1="280" y1="80" x2="295" y2="80" stroke="#d32f2f" stroke-width="3"/>
+      </svg>
+    </div>
+    <div class="header-right">
+      <div class="contact-icons">
+        <a href="mailto:comptoir.distribution@autop.tn" class="email" title="Email">📧</a>
+        <a href="https://wa.me/21698774525" target="_blank" class="whatsapp" title="WhatsApp">💬</a>
+      </div>
+      <nav class="nav-links">
+        <a href="admin.html">Espace Pro</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<!-- TRACKING SECTION -->
+<div class="tracking-section">
+  <div class="tracking-container">
+    <div>
+      <div class="tracking-box">
+        <h3>🔍 Suivi de votre devis</h3>
+        <input type="text" id="trackingInput" placeholder="Entrez votre numéro de devis (ex: DEM-20260701-001)">
+        <button class="search-btn" onclick="trackDevis()">Rechercher</button>
+      </div>
+    </div>
+    <div class="tracking-result" id="trackingResult">
+      <div class="tracking-box">
+        <h3>📊 Détails de votre devis</h3>
+        <div class="status-info">
+          <div class="status-label">État d'avancement</div>
+          <div class="status-value">
+            <span class="status-badge" id="resultStatus" style="display: inline-block;"></span>
+          </div>
+        </div>
+        <div class="status-info">
+          <div class="status-label">Date</div>
+          <div class="status-value" id="resultDate"></div>
+        </div>
+        <div class="status-info">
+          <div class="status-label">Nombre de pièces</div>
+          <div class="status-value" id="resultPieces"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Demande de Devis — Pièces Auto</h1>
+  <p>Rapide • Sécurisé • Suivi en temps réel</p>
+  <div class="trust-badges">
+    <div><span>✅ 100%</span> Gratuit</div>
+    <div><span>⚡ Réponse</span> en 2h</div>
+    <div><span>📞 Support</span> 24/7</div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="features">
+  <div class="feature">
+    <div class="feature-icon">⚡</div>
+    <h3>Rapide</h3>
+    <p>Remplissez en 2 min</p>
+  </div>
+  <div class="feature">
+    <div class="feature-icon">🔒</div>
+    <h3>Sécurisé</h3>
+    <p>Vos données protégées</p>
+  </div>
+  <div class="feature">
+    <div class="feature-icon">📞</div>
+    <h3>Support</h3>
+    <p>Contact immédiat</p>
+  </div>
+  <div class="feature">
+    <div class="feature-icon">💰</div>
+    <h3>Gratuit</h3>
+    <p>Aucun frais caché</p>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="container">
+  <form id="demandeForm" onsubmit="return submitDemande(event)">
+
+    <!-- INFORMATIONS CLIENT -->
+    <div class="form-group">
+      <h3 style="margin-bottom: 16px; color: #d32f2f;">📋 Vos informations</h3>
+      <div class="form-row">
+        <div>
+          <label for="nom" class="required">Nom complet</label>
+          <input type="text" id="nom" name="nom" required>
+        </div>
+        <div>
+          <label for="email" class="required">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div>
+          <label for="telephone" class="required">Téléphone</label>
+          <input type="tel" id="telephone" name="telephone" required>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFORMATIONS VÉHICULE -->
+    <div class="form-group">
+      <h3 style="margin-bottom: 16px; color: #d32f2f;">🚗 Informations du véhicule</h3>
+      <div class="form-row">
+        <div>
+          <label for="marque" class="required">Marque</label>
+          <input type="text" id="marque" name="marque" placeholder="ex: Renault" required>
+        </div>
+        <div>
+          <label for="modele" class="required">Modèle</label>
+          <input type="text" id="modele" name="modele" placeholder="ex: Clio" required>
+        </div>
+        <div>
+          <label for="annee" class="required">Année</label>
+          <input type="number" id="annee" name="annee" min="1990" max="2050" placeholder="ex: 2020" required>
+        </div>
+        <div>
+          <label for="kilometrage">Kilométrage</label>
+          <input type="number" id="kilometrage" name="kilometrage" placeholder="ex: 50000">
+        </div>
+      </div>
+    </div>
+
+    <!-- PIÈCES DEMANDÉES -->
+    <div class="pieces-section">
+      <h3>🔧 Pièces demandées</h3>
+      <div id="piecesContainer">
+        <div class="piece-row" data-piece-id="1">
+          <input type="text" class="piece-des" placeholder="Désignation de la pièce" required>
+          <input type="text" class="piece-ref" placeholder="Référence OEM">
+          <input type="number" class="piece-qte" placeholder="Quantité" value="1" min="1" required>
+          <select class="piece-urg">
+            <option value="Normal">Normal</option>
+            <option value="Urgent">Urgent ⚡</option>
+          </select>
+          <button type="button" class="btn-remove" onclick="removePiece(this)" style="opacity: 0; pointer-events: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+      </div>
+      <button type="button" class="btn-add-piece" onclick="addPiece()">+ Ajouter une pièce</button>
+    </div>
+
+    <!-- FILE UPLOAD SECTION -->
+    <div class="files-section">
+      <h3>📸 Photos et Documents (Optionnel)</h3>
+      <p>Téléchargez des photos ou documents pour faciliter le devis<br><small>(Images, PDF, Word, etc.)</small></p>
+      <div class="file-input-wrapper">
+        <input type="file" id="fileInput" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleFileSelect(event)">
+        <button type="button" class="file-upload-btn" onclick="document.getElementById('fileInput').click()">
+          📁 Choisir des fichiers
+        </button>
+      </div>
+      <div class="max-files-info">Maximum 10 fichiers, 5 MB par fichier</div>
+      <div class="files-list" id="filesList"></div>
+    </div>
+
+    <!-- MESSAGE -->
+    <div class="form-group">
+      <label for="message">Message supplémentaire</label>
+      <textarea id="message" name="message" placeholder="Décrivez votre demande en détail..."></textarea>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="actions">
+      <button type="submit" class="btn btn-primary">📤 Envoyer mon devis</button>
+      <button type="reset" class="btn btn-outline">Réinitialiser</button>
+    </div>
+  </form>
+</div>
+
+<!-- CONFIRMATION -->
+<div class="confirmation" id="confirmation">
+  <div class="confirmation-content">
+    <h2>✅ Demande envoyée avec succès !</h2>
+    <p>Votre numéro de suivi :</p>
+    <div class="num" id="numDemande">DEM-20260705-001</div>
+    <p>Nous vous contacterons sous <strong>2 heures</strong> par email ou téléphone.</p>
+    <p style="color: #666; font-size: 13px; margin-top: 12px;">📱 Vous pouvez suivre votre demande en haut de cette page avec ce numéro.</p>
+
+    <div class="send-options">
+      <button class="btn btn-outline" id="btnEmailAutop">📧 Envoyer par email</button>
+      <button class="btn btn-outline" id="btnWhats1">💬 WhatsApp #1</button>
+      <button class="btn btn-outline" id="btnWhats2">💬 WhatsApp #2</button>
+    </div>
+
+    <div class="actions" style="justify-content: center; margin-top: 24px;">
+      <button class="btn btn-primary" onclick="nouvelleDemande()">Nouvelle demande</button>
+      <button class="btn btn-outline" onclick="window.location.href='admin.html'">Accès Espace Pro</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-content">
+    <p>AUTOP — Vente de pièces automobiles</p>
+    <div class="footer-links">
+      <a href="mailto:comptoir.distribution@autop.tn">📧 Email</a>
+      <a href="https://wa.me/21698774525">💬 WhatsApp</a>
+    </div>
+    <div class="footer-links" style="margin-top: 8px;">
+      <a href="admin.html">🔑 Accès espace professionnel</a>
+    </div>
+    <p style="margin-top: 16px; font-size: 12px; color: #888;">© 2026 AUTOP. Tous droits réservés.</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let pieceCount = 1;
+let uploadedFiles = [];
+const MAX_FILES = 10;
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+function handleFileSelect(event) {
+  const files = Array.from(event.target.files);
+  
+  // Validate number of files
+  if (uploadedFiles.length + files.length > MAX_FILES) {
+    showToast(`❌ Maximum ${MAX_FILES} fichiers autorisés`, 'error');
+    return;
+  }
+
+  // Validate file sizes and add files
+  files.forEach((file, index) => {
+    if (file.size > MAX_FILE_SIZE) {
+      showToast(`❌ ${file.name}: fichier trop volumineux (max 5 MB)`, 'error');
+      return;
+    }
+
+    // Convert file to base64 for storage
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      uploadedFiles.push({
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        data: e.target.result
+      });
+      renderFiles();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Reset input
+  event.target.value = '';
+}
+
+function renderFiles() {
+  const list = document.getElementById('filesList');
+  list.innerHTML = uploadedFiles.map((file, i) => `
+    <div class="file-item">
+      ${file.name.substring(0, 20)}
+      <button type="button" class="file-remove-btn" onclick="removeFile(${i})">✕</button>
+    </div>
+  `).join('');
+}
+
+function removeFile(index) {
+  uploadedFiles.splice(index, 1);
+  renderFiles();
+}
+
+function addPiece() {
+  pieceCount++;
+  const html = `
+    <div class="piece-row" data-piece-id="${pieceCount}">
+      <input type="text" class="piece-des" placeholder="Désignation de la pièce" required>
+      <input type="text" class="piece-ref" placeholder="Référence OEM">
+      <input type="number" class="piece-qte" placeholder="Quantité" value="1" min="1" required>
+      <select class="piece-urg">
+        <option value="Normal">Normal</option>
+        <option value="Urgent">Urgent ⚡</option>
+      </select>
+      <button type="button" class="btn-remove" onclick="removePiece(this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+  `;
+  document.getElementById('piecesContainer').insertAdjacentHTML('beforeend', html);
+  updateRemoveButtons();
+}
+
+function removePiece(btn) { 
+  const row = btn.closest('.piece-row'); 
+  if(row){ row.remove(); updateRemoveButtons(); }
+}
+
+function updateRemoveButtons() { 
+  const rows = document.querySelectorAll('.piece-row'); 
+  rows.forEach((row) => { 
+    const btn = row.querySelector('.btn-remove'); 
+    if(!btn) return; 
+    if(rows.length === 1){ 
+      btn.style.opacity = '0'; 
+      btn.style.pointerEvents = 'none'; 
+    } else { 
+      btn.style.opacity = '1'; 
+      btn.style.pointerEvents = 'auto'; 
+    } 
+  }); 
+}
+
+function showToast(msg, type) { 
+  const t = document.getElementById('toast'); 
+  t.textContent = msg; 
+  t.className = 'toast ' + (type || 'success'); 
+  t.classList.add('show'); 
+  setTimeout(() => t.classList.remove('show'), 3000); 
+}
+
+function trackDevis() {
+  const num = document.getElementById('trackingInput').value.trim();
+  if (!num) {
+    showToast('❌ Veuillez entrer un numéro de devis', 'error');
+    return;
+  }
+
+  const demandes = JSON.parse(localStorage.getItem('demandes') || '[]');
+  const demande = demandes.find(d => d.num === num);
+
+  if (!demande) {
+    showToast('❌ Devis introuvable', 'error');
+    document.getElementById('trackingResult').classList.remove('show');
+    return;
+  }
+
+  document.getElementById('resultStatus').textContent = demande.statut || 'En attente';
+  document.getElementById('resultDate').textContent = demande.date;
+  document.getElementById('resultPieces').textContent = (demande.pieces || []).length;
+  document.getElementById('trackingResult').classList.add('show');
+  showToast('✅ Devis trouvé !', 'success');
+}
+
+function submitDemande(e) {
+  e.preventDefault();
+  const now = new Date();
+  const num = 'DEM-' + now.toISOString().slice(0,10).replace(/-/g,'') + '-' + String(Math.floor(Math.random()*900)+100).padStart(3,'0');
+  document.getElementById('numDemande').textContent = num;
+
+  const pieces = [];
+  document.querySelectorAll('.piece-row').forEach(row => {
+    const des = row.querySelector('.piece-des').value;
+    const ref = row.querySelector('.piece-ref').value;
+    const qte = row.querySelector('.piece-qte').value;
+    const urg = row.querySelector('.piece-urg').value;
+    if (des) pieces.push({ des, ref, qte, urg });
+  });
+
+  const demande = {
+    num: num,
+    date: now.toLocaleDateString('fr-FR'),
+    heure: now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}),
+    client: document.getElementById('nom').value,
+    email: document.getElementById('email').value,
+    telephone: document.getElementById('telephone').value,
+    vehicule: document.getElementById('marque').value + ' ' + document.getElementById('modele').value,
+    annee: document.getElementById('annee').value,
+    pieces: pieces,
+    files: uploadedFiles,
+    message: document.getElementById('message').value,
+    statut: 'En attente'
+  };
+
+  try {
+    const demandes = JSON.parse(localStorage.getItem('demandes') || '[]');
+    demandes.unshift(demande);
+    localStorage.setItem('demandes', JSON.stringify(demandes));
+
+    try {
+      const bc = new BroadcastChannel('demandes_channel');
+      bc.postMessage({ type: 'nouvelle_demande', demande });
+      bc.close();
+    } catch(e) {}
+
+    resetForm();
+    document.getElementById('demandeForm').style.display = 'none';
+    document.getElementById('confirmation').classList.add('show');
+    showToast('✅ Demande envoyée !', 'success');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    setupConfirmationActions(demande);
+  } catch(e) {
+    console.error('Erreur:', e);
+    showToast('❌ Erreur lors de l\'envoi', 'error');
+  }
+  return false;
+}
+
+function setupConfirmationActions(demande) {
+  const emailBtn = document.getElementById('btnEmailAutop');
+  const waBtn1 = document.getElementById('btnWhats1');
+  const waBtn2 = document.getElementById('btnWhats2');
+  const autopEmail = 'comptoir.distribution@autop.tn';
+  const waNum1 = '+21698774525';
+  const waNum2 = '+21698171411';
+  const subject = encodeURIComponent('Nouvelle demande de devis - ' + demande.num);
+  const bodyLines = [];
+  bodyLines.push('🔔 *NOUVELLE DEMANDE DE DEVIS*');
+  bodyLines.push('');
+  bodyLines.push('📋 *Numéro:* ' + demande.num);
+  bodyLines.push('👤 *Client:* ' + (demande.client || ''));
+  bodyLines.push('📞 *Tel:* ' + (demande.telephone || ''));
+  bodyLines.push('📧 *Email:* ' + (demande.email || ''));
+  bodyLines.push('🚗 *Véhicule:* ' + (demande.vehicule || '') + ' (' + (demande.annee || '') + ')');
+  bodyLines.push('');
+  bodyLines.push('🔧 *Pièces demandées:*');
+  (demande.pieces || []).forEach(p => { 
+    bodyLines.push('  • ' + p.des + ' (qte: ' + p.qte + ', ' + p.urg + ')'); 
+  });
+  if (demande.files && demande.files.length > 0) {
+    bodyLines.push('');
+    bodyLines.push('📎 *Fichiers attachés:* ' + demande.files.length + ' fichier(s)');
+  }
+  bodyLines.push('');
+  bodyLines.push('💬 *Message:* ' + (demande.message || 'N/A'));
+  bodyLines.push('');
+  bodyLines.push('⏰ *Date:* ' + demande.date + ' ' + demande.heure);
+  
+  const body = encodeURIComponent(bodyLines.join('\n'));
+
+  emailBtn.onclick = function() { 
+    window.open('mailto:' + autopEmail + '?subject=' + subject + '&body=' + body, '_blank'); 
+    showToast('📧 Ouverture email...', 'success');
+  };
+  waBtn1.onclick = function() { 
+    window.open('https://wa.me/' + waNum1.replace(/\+/g,'') + '?text=' + body, '_blank'); 
+    showToast('💬 Ouverture WhatsApp...', 'success');
+  };
+  waBtn2.onclick = function() { 
+    window.open('https://wa.me/' + waNum2.replace(/\+/g,'') + '?text=' + body, '_blank'); 
+    showToast('💬 Ouverture WhatsApp...', 'success');
+  };
+}
+
+function resetForm() { 
+  document.getElementById('demandeForm').reset(); 
+  uploadedFiles = [];
+  document.getElementById('filesList').innerHTML = '';
+  document.getElementById('piecesContainer').innerHTML = `
+    <div class="piece-row" data-piece-id="1">
+      <input type="text" class="piece-des" placeholder="Désignation de la pièce" required>
+      <input type="text" class="piece-ref" placeholder="Référence OEM">
+      <input type="number" class="piece-qte" placeholder="Quantité" value="1" min="1" required>
+      <select class="piece-urg">
+        <option value="Normal">Normal</option>
+        <option value="Urgent">Urgent ⚡</option>
+      </select>
+      <button type="button" class="btn-remove" onclick="removePiece(this)" style="opacity: 0; pointer-events: none;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+  `; 
+  pieceCount = 1; 
+  updateRemoveButtons(); 
+}
+
+function nouvelleDemande() { 
+  resetForm(); 
+  document.getElementById('demandeForm').style.display = 'block'; 
+  document.getElementById('confirmation').classList.remove('show'); 
+  window.scrollTo({ top: 0, behavior: 'smooth' }); 
+}
+
+document.addEventListener('DOMContentLoaded', function() { 
+  updateRemoveButtons(); 
+  document.getElementById('trackingInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') trackDevis();
+  });
+});
+</script>
+
+</body>
+</html>
