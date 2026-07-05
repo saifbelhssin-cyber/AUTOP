@@ -3,841 +3,1087 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AUTOP — Demande de devis & Espace Suivi</title>
+  <title>AUTOP — Devis Pièces Auto</title>
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
     :root {
-      --bg: #f8fafc;
-      --surface: #ffffff;
-      --text: #0f172a;
-      --text-muted: #64748b;
-      --primary: #be123c;       /* Rouge auto premium */
-      --primary-hover: #9f1239;
-      --dark: #0f172a;          /* Ardoise/Bleu nuit chic */
-      --border: #e2e8f0;
-      --border-focus: #be123c;
+      --primary: #c41e3a;
+      --primary-light: #e85d75;
+      --primary-dark: #8b1528;
+      --accent: #1f2937;
+      --light: #f9fafb;
+      --white: #ffffff;
+      --gray-200: #e5e7eb;
+      --gray-500: #6b7280;
+      --gray-700: #374151;
       --success: #10b981;
       --warning: #f59e0b;
-      --info: #0284c7;
-      --radius: 12px;
-      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --info: #3b82f6;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+      color: var(--accent);
+      line-height: 1.6;
+      overflow-x: hidden;
     }
 
-    /* TOP BAR */
-    .top-bar {
-      background: var(--dark);
-      padding: 10px 24px;
-      text-align: center;
-      font-size: 13px;
-      color: #94a3b8;
-      border-bottom: 1px solid #1e293b;
-    }
-    .top-bar a {
-      color: #f1f5f9;
-      text-decoration: none;
-      margin: 0 12px;
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-    .top-bar a:hover { color: var(--primary); }
-
-    /* HEADER */
-    .header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 16px 24px;
+    /* ===== NAVBAR PREMIUM ===== */
+    nav {
+      background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+      padding: 0;
       position: sticky;
       top: 0;
-      z-index: 100;
-      box-shadow: var(--shadow);
+      z-index: 1000;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
     }
-    .header-inner {
-      max-width: 1200px;
+
+    .navbar-top {
+      background: rgba(0,0,0,0.1);
+      padding: 12px 0;
+      text-align: center;
+      font-size: 13px;
+      color: rgba(255,255,255,0.9);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .navbar-top a {
+      color: white;
+      text-decoration: none;
+      margin: 0 16px;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .navbar-top a:hover { color: var(--primary-light); }
+
+    .navbar-main {
+      max-width: 1400px;
       margin: 0 auto;
+      padding: 20px 30px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 24px;
-    }
-    .logo-container {
-      display: flex;
-      align-items: center;
     }
 
-    .header-right {
+    .logo {
+      font-size: 28px;
+      font-weight: 900;
+      color: white;
+      letter-spacing: -1px;
       display: flex;
       align-items: center;
-      gap: 20px;
-    }
-    .contact-icons {
-      display: flex;
       gap: 10px;
     }
-    .contact-icons a {
-      width: 40px;
-      height: 40px;
-      border-radius: var(--radius);
-      background: #f1f5f9;
-      color: var(--dark);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      font-size: 18px;
-      transition: all 0.2s;
+
+    .logo::before {
+      content: '🏎️';
+      font-size: 32px;
     }
-    .contact-icons a:hover {
-      background: var(--primary);
-      color: white;
-      transform: translateY(-2px);
+
+    .nav-right {
+      display: flex;
+      gap: 20px;
+      align-items: center;
     }
 
     .nav-links a {
-      color: var(--dark);
-      text-decoration: none;
-      padding: 10px 20px;
-      border-radius: var(--radius);
-      font-size: 14px;
-      font-weight: 600;
-      transition: all 0.2s;
-      border: 1px solid var(--dark);
-    }
-    .nav-links a:hover { 
-      background: var(--dark);
       color: white;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: all 0.3s;
     }
 
-    /* TRACKING / ESPACE CLIENT */
-    .tracking-section {
-      background: #f1f5f9;
-      padding: 32px 0;
-      border-bottom: 1px solid var(--border);
+    .nav-links a:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-2px);
     }
-    .tracking-container {
-      max-width: 1200px;
+
+    /* ===== HERO ===== */
+    .hero {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: 100px 30px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -50%;
+      left: -10%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
       margin: 0 auto;
-      padding: 0 24px;
     }
-    .tracking-card {
-      background: var(--surface);
-      padding: 24px;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border);
+
+    .hero h1 {
+      font-size: 54px;
+      font-weight: 900;
+      margin-bottom: 20px;
+      letter-spacing: -1px;
+      line-height: 1.1;
     }
-    .tracking-card h3 {
-      color: var(--dark);
-      margin-bottom: 16px;
-      font-size: 18px;
+
+    .hero p {
+      font-size: 20px;
+      opacity: 0.95;
+      margin-bottom: 40px;
+    }
+
+    .hero-badges {
       display: flex;
-      align-items: center;
-      gap: 8px;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
     }
-    .search-group {
+
+    .badge {
+      background: rgba(255,255,255,0.2);
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 14px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    /* ===== TRACKING SECTION ===== */
+    .tracking-hero {
+      background: white;
+      padding: 60px 30px;
+    }
+
+    .tracking-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .tracking-title {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .tracking-title h2 {
+      font-size: 42px;
+      margin-bottom: 10px;
+      color: var(--accent);
+    }
+
+    .tracking-title p {
+      color: var(--gray-500);
+      font-size: 18px;
+    }
+
+    .search-box {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+      border: 2px solid var(--gray-200);
+    }
+
+    .search-input-group {
       display: flex;
       gap: 12px;
     }
-    .search-group input {
+
+    .search-input-group input {
       flex: 1;
-      padding: 12px 16px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      font-size: 14px;
+      padding: 18px 24px;
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      font-size: 16px;
+      transition: all 0.3s;
     }
-    .search-group input:focus {
+
+    .search-input-group input:focus {
       outline: none;
-      border-color: var(--border-focus);
-      box-shadow: 0 0 0 3px rgba(190, 18, 60, 0.1);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(196, 30, 58, 0.1);
     }
+
     .search-btn {
-      padding: 12px 24px;
-      background: var(--dark);
+      padding: 18px 40px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
       color: white;
       border: none;
-      border-radius: var(--radius);
-      font-weight: 600;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 16px;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.3s;
+      box-shadow: 0 10px 30px rgba(196, 30, 58, 0.3);
     }
-    .search-btn:hover { background: var(--primary); }
 
-    /* DASHBOARD CLIENT DE VISU */
-    .client-dashboard {
-      display: none;
-      margin-top: 24px;
-      animation: fadeIn 0.4s ease-out;
+    .search-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(196, 30, 58, 0.4);
     }
-    .client-dashboard.show { display: block; }
-    
-    /* TIMELINE DE SUIVI */
+
+    /* ===== DASHBOARD ===== */
+    .dashboard {
+      display: none;
+      margin-top: 40px;
+      animation: slideUp 0.6s ease-out;
+    }
+
+    .dashboard.show { display: block; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dashboard-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(196, 30, 58, 0.2);
+    }
+
+    .dashboard-header h3 {
+      font-size: 28px;
+      margin-bottom: 15px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .info-card {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      border-left: 5px solid var(--primary);
+    }
+
+    .info-card-label {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--gray-500);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .info-card-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--accent);
+      word-break: break-word;
+    }
+
+    .info-card-desc {
+      font-size: 14px;
+      color: var(--gray-500);
+      margin-top: 10px;
+    }
+
+    /* ===== TIMELINE ===== */
+    .timeline-section {
+      margin-top: 50px;
+    }
+
+    .timeline-title {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 40px;
+      color: var(--accent);
+    }
+
     .timeline {
       position: relative;
       padding: 20px 0;
-      margin-top: 24px;
     }
+
     .timeline::before {
       content: '';
       position: absolute;
-      left: 30px;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: var(--border);
+      left: 50%;
+      transform: translateX(-50%);
+      width: 3px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--primary) 0%, var(--primary-light) 50%, var(--gray-200) 100%);
     }
+
     .timeline-item {
-      margin-bottom: 30px;
-      padding-left: 80px;
+      margin-bottom: 50px;
+      width: 48%;
       position: relative;
     }
+
+    .timeline-item:nth-child(odd) {
+      margin-left: 0;
+      text-align: right;
+      padding-right: 5%;
+    }
+
+    .timeline-item:nth-child(even) {
+      margin-left: 52%;
+      text-align: left;
+      padding-left: 5%;
+    }
+
     .timeline-item::before {
       content: '';
       position: absolute;
-      left: 18px;
-      top: 5px;
       width: 24px;
       height: 24px;
+      background: white;
+      border: 4px solid var(--gray-200);
       border-radius: 50%;
-      background: #e2e8f0;
-      border: 3px solid var(--surface);
+      top: 0;
+      right: -48px;
     }
+
+    .timeline-item:nth-child(odd)::before {
+      left: -48px;
+      right: auto;
+    }
+
     .timeline-item.active::before {
-      background: var(--success);
+      background: var(--primary);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 8px rgba(196, 30, 58, 0.1);
     }
-    .timeline-item.active .timeline-title { color: var(--success); font-weight: 700; }
-    .timeline-item.active .timeline-dot { background: var(--success); }
-    
-    .timeline-dot {
-      position: absolute;
-      left: 21px;
-      top: 8px;
-      width: 18px;
-      height: 18px;
-      background: var(--border);
+
+    .timeline-content {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      border-top: 4px solid var(--gray-200);
+      transition: all 0.3s;
+    }
+
+    .timeline-item.active .timeline-content {
+      border-top-color: var(--primary);
+      box-shadow: 0 15px 40px rgba(196, 30, 58, 0.15);
+      transform: translateY(-5px);
+    }
+
+    .timeline-number {
+      display: inline-block;
+      width: 36px;
+      height: 36px;
+      background: var(--gray-200);
       border-radius: 50%;
+      line-height: 36px;
+      text-align: center;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 12px;
     }
-    
-    .timeline-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--dark);
-      margin-bottom: 4px;
+
+    .timeline-item.active .timeline-number {
+      background: var(--primary);
+      color: white;
     }
-    .timeline-desc {
-      font-size: 13px;
-      color: var(--text-muted);
+
+    .timeline-title-text {
+      font-size: 18px;
+      font-weight: 800;
       margin-bottom: 8px;
+      color: var(--accent);
     }
-    .timeline-date {
-      font-size: 12px;
-      color: #cbd5e1;
-      font-weight: 500;
+
+    .timeline-desc {
+      font-size: 14px;
+      color: var(--gray-500);
+      margin-bottom: 12px;
     }
 
     .status-badge {
       display: inline-block;
-      padding: 6px 12px;
+      padding: 6px 14px;
       border-radius: 50px;
       font-size: 12px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    .badge-pending { background: #fef3c7; color: #d97706; }
-    .badge-process { background: #e0f2fe; color: #0369a1; }
+
     .badge-success { background: #d1fae5; color: #047857; }
-    .badge-shipped { background: #f3e8ff; color: #7c3aed; }
-    .badge-delivered { background: #dcfce7; color: #166534; }
+    .badge-process { background: #dbeafe; color: #0284c7; }
+    .badge-pending { background: #fef3c7; color: #d97706; }
+    .badge-shipped { background: #e9d5ff; color: #7c3aed; }
 
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 16px;
-      margin-top: 20px;
-    }
-    .info-box {
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-    }
-    .info-box-title {
-      font-size: 13px;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      letter-spacing: 0.05em;
-      margin-bottom: 8px;
-    }
-    .info-box-value {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--dark);
-    }
-    .info-box-desc {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 8px;
+    /* ===== FORM SECTION ===== */
+    .form-section {
+      background: white;
+      padding: 60px 30px;
     }
 
-    .doc-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--primary);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 14px;
-      margin-top: 8px;
-    }
-    .doc-link:hover { text-decoration: underline; }
-
-    /* HERO */
-    .hero {
-      padding: 56px 24px;
-      text-align: center;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-    .hero h1 { 
-      font-size: 36px; 
-      font-weight: 800; 
-      margin-bottom: 12px;
-      color: var(--dark);
-      letter-spacing: -0.02em;
-    }
-    .hero p { 
-      color: var(--text-muted); 
-      font-size: 16px; 
-      margin-bottom: 24px;
-    }
-    .trust-badges {
-      display: flex;
-      justify-content: center;
-      gap: 24px;
-      flex-wrap: wrap;
-      font-size: 14px;
-      color: var(--dark);
-      font-weight: 500;
-    }
-    .trust-badge span { color: var(--primary); font-weight: 700; }
-
-    /* FORM & CONTAINER */
     .container {
-      max-width: 1000px;
+      max-width: 900px;
       margin: 0 auto;
-      padding: 0 24px 60px;
     }
-    .form-card {
-      background: var(--surface);
-      border-radius: var(--radius);
-      padding: 32px;
-      box-shadow: var(--shadow-lg);
-      border: 1px solid var(--border);
+
+    .section-title {
+      font-size: 42px;
+      font-weight: 900;
+      margin-bottom: 15px;
+      color: var(--accent);
     }
-    .form-section-title {
+
+    .section-subtitle {
       font-size: 18px;
-      color: var(--dark);
-      margin-bottom: 20px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid var(--border);
+      color: var(--gray-500);
+      margin-bottom: 50px;
     }
+
+    .form-card {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+      border: 2px solid var(--gray-200);
+    }
+
+    .form-group-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 3px solid var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
     .form-row {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 20px;
-      margin-bottom: 24px;
+      margin-bottom: 30px;
     }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
     label {
-      display: block;
-      margin-bottom: 8px;
-      color: var(--dark);
-      font-weight: 600;
-      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--accent);
+      font-size: 14px;
     }
-    .required::after { content: ' *'; color: var(--primary); }
+
+    .required::after {
+      content: ' *';
+      color: var(--primary);
+      font-weight: 900;
+    }
 
     input, select, textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      font-size: 14px;
-      background: #f8fafc;
-      color: var(--text);
-      transition: all 0.2s;
+      padding: 14px 18px;
+      border: 2px solid var(--gray-200);
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: inherit;
+      transition: all 0.3s;
+      background: #f9fafb;
     }
+
     input:focus, select:focus, textarea:focus {
       outline: none;
-      border-color: var(--border-focus);
-      background: var(--surface);
-      box-shadow: 0 0 0 3px rgba(190, 18, 60, 0.1);
+      border-color: var(--primary);
+      background: white;
+      box-shadow: 0 0 0 4px rgba(196, 30, 58, 0.1);
     }
 
-    /* PIECES CONTAINER */
-    .pieces-section {
-      background: #f8fafc;
-      padding: 24px;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      margin-bottom: 24px;
+    textarea {
+      resize: vertical;
+      min-height: 120px;
     }
+
+    /* ===== PIECES SECTION ===== */
+    .pieces-section {
+      background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+      padding: 30px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      border: 2px dashed var(--primary);
+    }
+
     .piece-row {
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr 44px;
+      grid-template-columns: 2fr 1fr 1fr 1fr 50px;
       gap: 12px;
       align-items: end;
-      margin-bottom: 12px;
+      margin-bottom: 15px;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
+
     .btn-remove {
-      width: 42px;
-      height: 42px;
-      border: 1px solid #fee2e2;
-      border-radius: var(--radius);
+      width: 45px;
+      height: 45px;
+      border: 2px solid #ef4444;
       background: #fef2f2;
       color: #ef4444;
+      border-radius: 10px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-    }
-    .btn-remove:hover { background: #fee2e2; }
-
-    .btn-add-piece {
-      background: var(--surface);
-      color: var(--dark);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 10px 20px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: var(--shadow);
-      transition: all 0.2s;
-    }
-    .btn-add-piece:hover { background: #f1f5f9; }
-
-    /* ZONE TELECHARGEMENT */
-    .files-section {
-      border: 2px dashed var(--border);
-      background: #f8fafc;
-      border-radius: var(--radius);
-      padding: 32px;
-      margin-bottom: 24px;
-      text-align: center;
-      transition: border-color 0.2s;
-    }
-    .files-section:hover { border-color: var(--primary); }
-    .file-upload-btn {
-      padding: 10px 20px;
-      background: var(--surface);
-      color: var(--dark);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      cursor: pointer;
-      font-weight: 600;
-      box-shadow: var(--shadow);
+      font-weight: 700;
+      transition: all 0.3s;
     }
 
-    /* ACTION BUTTONS */
-    .actions {
-      display: flex;
-      gap: 12px;
-      justify-content: flex-end;
-    }
-    .btn {
-      padding: 14px 28px;
-      border: none;
-      border-radius: var(--radius);
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .btn-primary {
-      background: var(--primary);
+    .btn-remove:hover {
+      background: #ef4444;
       color: white;
     }
-    .btn-primary:hover {
-      background: var(--primary-hover);
-      transform: translateY(-1px);
-    }
-    .btn-outline {
-      border: 1px solid var(--border);
-      color: var(--dark);
-      background: var(--surface);
-    }
-    .btn-outline:hover { background: #f1f5f9; }
 
-    /* CONFIRMATION MODAL */
-    .confirmation {
+    .btn-add-piece {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 15px;
+    }
+
+    .btn-add-piece:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(196, 30, 58, 0.3);
+    }
+
+    /* ===== FILES SECTION ===== */
+    .files-section {
+      border: 3px dashed var(--primary);
+      background: linear-gradient(135deg, rgba(196, 30, 58, 0.05) 0%, rgba(196, 30, 58, 0.02) 100%);
+      border-radius: 15px;
+      padding: 40px;
+      text-align: center;
+      margin-bottom: 30px;
+      transition: all 0.3s;
+    }
+
+    .files-section:hover {
+      border-color: var(--primary-light);
+      background: linear-gradient(135deg, rgba(196, 30, 58, 0.08) 0%, rgba(196, 30, 58, 0.04) 100%);
+    }
+
+    .file-upload-btn {
+      padding: 16px 32px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 10px 30px rgba(196, 30, 58, 0.3);
+    }
+
+    .file-upload-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(196, 30, 58, 0.4);
+    }
+
+    .files-list {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .file-item {
+      background: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      border: 2px solid var(--gray-200);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    .file-remove {
+      color: #ef4444;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* ===== BUTTONS ===== */
+    .actions {
+      display: flex;
+      gap: 15px;
+      justify-content: flex-end;
+      margin-top: 40px;
+    }
+
+    .btn {
+      padding: 16px 36px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      box-shadow: 0 10px 30px rgba(196, 30, 58, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(196, 30, 58, 0.4);
+    }
+
+    .btn-outline {
+      border: 2px solid var(--gray-200);
+      color: var(--accent);
+      background: white;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* ===== MODAL ===== */
+    .modal {
       display: none;
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(4px);
-      z-index: 500;
+      background: rgba(0,0,0,0.7);
+      z-index: 2000;
       align-items: center;
       justify-content: center;
+      backdrop-filter: blur(4px);
     }
-    .confirmation.show { display: flex; }
-    .confirmation-content {
-      background: var(--surface);
-      border-radius: 16px;
-      padding: 40px;
-      max-width: 550px;
-      width: 90%;
+
+    .modal.show { display: flex; }
+
+    .modal-content {
+      background: white;
+      padding: 60px 50px;
+      border-radius: 25px;
+      max-width: 600px;
+      width: 95%;
       text-align: center;
-      box-shadow: var(--shadow-lg);
+      box-shadow: 0 40px 60px rgba(0,0,0,0.3);
+      animation: zoomIn 0.4s ease-out;
     }
-    .num {
-      font-family: monospace;
-      font-size: 20px;
-      font-weight: 700;
+
+    @keyframes zoomIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .modal-number {
+      font-family: 'Courier New', monospace;
+      font-size: 32px;
+      font-weight: 900;
       color: var(--primary);
-      background: #fff1f2;
-      padding: 14px;
-      border-radius: var(--radius);
-      margin: 16px 0;
-      border: 1px solid #fecdd3;
+      background: linear-gradient(135deg, rgba(196, 30, 58, 0.1) 0%, rgba(196, 30, 58, 0.05) 100%);
+      padding: 25px;
+      border-radius: 15px;
+      margin: 25px 0;
+      border: 3px solid var(--primary);
     }
 
-    /* FOOTER */
-    .footer {
-      background: var(--dark);
-      padding: 48px 24px;
+    .modal-buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .modal-buttons .btn { flex: 1; }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--primary-dark) 100%);
+      color: white;
       text-align: center;
-      color: #94a3b8;
-      font-size: 14px;
+      padding: 40px 30px;
     }
-    .footer-links a {
-      color: #f1f5f9;
-      text-decoration: none;
-      margin: 0 10px;
-    }
-    .footer-links a:hover { color: var(--primary); }
 
-    /* TOAST */
+    footer a {
+      color: var(--primary-light);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    /* ===== TOAST ===== */
     .toast {
       position: fixed;
-      bottom: 24px; right: 24px;
-      padding: 14px 24px;
-      border-radius: var(--radius);
+      bottom: 30px; right: 30px;
+      padding: 18px 28px;
+      border-radius: 12px;
       color: white;
-      font-size: 14px;
-      font-weight: 600;
-      box-shadow: var(--shadow-lg);
+      font-weight: 700;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
       opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.3s;
-      z-index: 2000;
+      transform: translateY(100px);
+      transition: all 0.4s;
+      z-index: 3000;
     }
+
     .toast.show { opacity: 1; transform: translateY(0); }
     .toast.success { background: var(--success); }
     .toast.error { background: #ef4444; }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* RESPONSIVE */
+    /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
-      .header-inner { flex-direction: column; gap: 16px; }
-      .search-group { flex-direction: column; }
-      .piece-row { grid-template-columns: 1fr; gap: 8px; }
+      .hero h1 { font-size: 36px; }
+      .hero p { font-size: 16px; }
+      .search-input-group { flex-direction: column; }
+      .piece-row { grid-template-columns: 1fr; }
       .btn-remove { width: 100%; }
+      .timeline::before { left: 20px; }
+      .timeline-item, .timeline-item:nth-child(even) {
+        width: 100%;
+        margin-left: 0;
+        padding-left: 80px;
+        text-align: left;
+      }
+      .timeline-item::before {
+        left: -8px;
+        right: auto;
+      }
       .actions { flex-direction: column; }
       .btn { width: 100%; }
-      .timeline::before { left: 15px; }
-      .timeline-item { padding-left: 60px; }
-      .timeline-item::before { left: 5px; }
-      .timeline-dot { left: 8px; }
+      .modal-buttons { flex-direction: column; }
     }
   </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
-<div class="top-bar">
-  📞 Appels : <a href="tel:+21698774525">+216 98 774 525</a> | <a href="tel:+21698171411">+216 98 171 411</a> | 
-  📧 <a href="mailto:comptoir.distribution@autop.tn">comptoir.distribution@autop.tn</a>
-</div>
-
-<!-- HEADER -->
-<header class="header">
-  <div class="header-inner">
-    <div class="logo-container">
-      <svg width="130" height="50" viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg">
-        <text x="10" y="65" font-size="65" font-weight="900" fill="#be123c" font-family="system-ui" letter-spacing="-3">AUTOP</text>
-        <text x="12" y="88" font-size="13" font-weight="600" fill="#64748b" font-family="system-ui" letter-spacing="1.5">AUTOMOTIVE PREMIUM</text>
-      </svg>
-    </div>
-    <div class="header-right">
-      <div class="contact-icons">
-        <a href="mailto:comptoir.distribution@autop.tn" title="Email">✉️</a>
-        <a href="https://wa.me/21698774525" target="_blank" title="WhatsApp">💬</a>
+<!-- NAVBAR -->
+<nav>
+  <div class="navbar-top">
+    📞 <a href="tel:+21698774525">+216 98 774 525</a> | 
+    <a href="tel:+21698171411">+216 98 171 411</a> | 
+    📧 <a href="mailto:comptoir.distribution@autop.tn">comptoir.distribution@autop.tn</a>
+  </div>
+  <div class="navbar-main">
+    <div class="logo">AUTOP</div>
+    <div class="nav-right">
+      <div class="nav-links">
+        <a href="mailto:comptoir.distribution@autop.tn">✉️ Email</a>
+        <a href="https://wa.me/21698774525" target="_blank">💬 WhatsApp</a>
+        <a href="admin.html">🔐 Admin</a>
       </div>
-      <nav class="nav-links">
-        <a href="admin.html">Espace Pro</a>
-      </nav>
     </div>
   </div>
-</header>
-
-<!-- ESPACE SUIVI CLIENT (COMPLET) -->
-<div class="tracking-section">
-  <div class="tracking-container">
-    <div class="tracking-card">
-      <h3>🔍 Espace Client - Suivi Complet</h3>
-      <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 12px;">Consultez en temps réel l'état de votre demande, commande, livraison et facture.</p>
-      <div class="search-group">
-        <input type="text" id="trackingInput" placeholder="Saisissez votre N° de demande (ex: DEM-20260705-001)">
-        <button class="search-btn" onclick="trackDossier()">Consulter mon dossier</button>
-      </div>
-
-      <!-- DASHBOARD SUIVI CLIENT INTERACTIF -->
-      <div class="client-dashboard" id="clientDashboard">
-        
-        <!-- INFORMATIONS CLIENT ET VEHICLE -->
-        <div class="info-grid" style="margin-bottom: 32px;">
-          <div class="info-box">
-            <div class="info-box-title">🧑 Client</div>
-            <div class="info-box-value" id="dashClient">-</div>
-            <div class="info-box-desc" id="dashContact">-</div>
-          </div>
-          <div class="info-box">
-            <div class="info-box-title">🚗 Véhicule</div>
-            <div class="info-box-value" id="dashVehicule">-</div>
-            <div class="info-box-desc" id="dashAnnee">-</div>
-          </div>
-          <div class="info-box">
-            <div class="info-box-title">📦 Pièces demandées</div>
-            <div class="info-box-value" id="dashNbPieces">0</div>
-            <div class="info-box-desc" id="dashUrgence">-</div>
-          </div>
-        </div>
-
-        <!-- TIMELINE DE SUIVI COMPLET -->
-        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 20px; color: var(--dark);">📊 État d'avancement</h4>
-        
-        <div class="timeline">
-          <!-- 1. DEMANDE -->
-          <div class="timeline-item active">
-            <div class="timeline-title">✓ Demande de Devis Reçue</div>
-            <div class="timeline-desc" id="statusDevis1">Votre demande a été enregistrée dans notre système</div>
-            <div class="timeline-date" id="dateDevis">-</div>
-            <span class="status-badge badge-success" id="badgeDevis">CONFIRMÉE</span>
-          </div>
-
-          <!-- 2. ANALYSE ET DEVIS -->
-          <div class="timeline-item" id="timelineAnalyse">
-            <div class="timeline-title">Étape 2 - Analyse et Préparation du Devis</div>
-            <div class="timeline-desc">Nos équipes examinent votre demande et les références pièces</div>
-            <div class="timeline-date" id="dateAnalyse">-</div>
-            <span class="status-badge badge-process" id="badgeAnalyse">EN COURS</span>
-          </div>
-
-          <!-- 3. DEVIS PROPOSÉ -->
-          <div class="timeline-item" id="timelineDevisPropose">
-            <div class="timeline-title">Devis Commercial Envoyé</div>
-            <div class="timeline-desc" id="statusDevis3">Vous recevrez le devis par email avec tarifs et délais</div>
-            <div class="timeline-date" id="dateDevisPropose">-</div>
-            <span class="status-badge badge-pending" id="badgeDevisPropose">EN ATTENTE VALIDATION</span>
-            <div id="invoiceContainer1"></div>
-          </div>
-
-          <!-- 4. COMMANDE CONFIRMÉE -->
-          <div class="timeline-item" id="timelineCommande">
-            <div class="timeline-title">Commande Créée et Confirmée</div>
-            <div class="timeline-desc" id="statusCommande">Votre commande est enregistrée auprès de nos fournisseurs</div>
-            <div class="timeline-date" id="dateCommande">-</div>
-            <span class="status-badge badge-pending" id="badgeCommande">ATTENTE</span>
-            <div id="orderInfoContainer"></div>
-          </div>
-
-          <!-- 5. PRÉPARATION -->
-          <div class="timeline-item" id="timelinePrepare">
-            <div class="timeline-title">Préparation et Conditionnement</div>
-            <div class="timeline-desc">Les pièces sont préparées et emballées selon les normes</div>
-            <div class="timeline-date" id="datePrepare">-</div>
-            <span class="status-badge badge-pending" id="badgePrepare">ATTENTE</span>
-          </div>
-
-          <!-- 6. EXPÉDITION -->
-          <div class="timeline-item" id="timelineShipped">
-            <div class="timeline-title">🚚 Expédition en Cours</div>
-            <div class="timeline-desc" id="statusShipped">Votre colis a quitté notre entrepôt</div>
-            <div class="timeline-date" id="dateShipped">-</div>
-            <span class="status-badge badge-shipped" id="badgeShipped">ATTENTE</span>
-            <div id="shippingContainer"></div>
-          </div>
-
-          <!-- 7. LIVRAISON -->
-          <div class="timeline-item" id="timelineDelivery">
-            <div class="timeline-title">✓ Livraison Effectuée</div>
-            <div class="timeline-desc" id="statusDelivery">Colis remis au client</div>
-            <div class="timeline-date" id="dateDelivery">-</div>
-            <span class="status-badge badge-pending" id="badgeDelivery">ATTENTE</span>
-          </div>
-
-          <!-- 8. FACTURE & PAIEMENT -->
-          <div class="timeline-item" id="timelineInvoice">
-            <div class="timeline-title">💳 Facture et Paiement</div>
-            <div class="timeline-desc" id="statusInvoice">Facture disponible et suivi de paiement</div>
-            <div class="timeline-date" id="dateInvoice">-</div>
-            <span class="status-badge badge-pending" id="badgeInvoice">ATTENTE</span>
-            <div id="invoiceContainer2"></div>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-  </div>
-</div>
+</nav>
 
 <!-- HERO -->
-<div class="hero">
-  <h1>Demande de Devis — Pièces Auto</h1>
-  <p>Service Premium pour professionnels et particuliers. Réponse rapide & transparente.</p>
-  <div class="trust-badges">
-    <div><span>✓</span> Gratuit sans engagement</div>
-    <div><span>⚡</span> Traitement en 2h</div>
-    <div><span>✓</span> Pièces d'origine certifiées</div>
+<section class="hero">
+  <div class="hero-content">
+    <h1>Demande de Devis Pièces Auto</h1>
+    <p>Trouvez les meilleures pièces automobiles au meilleur prix</p>
+    <div class="hero-badges">
+      <div class="badge">✅ 100% Gratuit</div>
+      <div class="badge">⚡ Réponse 2h</div>
+      <div class="badge">🔒 Sécurisé</div>
+    </div>
   </div>
-</div>
+</section>
 
-<!-- FORMULAIRE -->
-<div class="container">
-  <form id="demandeForm" class="form-card" onsubmit="return submitDemande(event)">
+<!-- TRACKING SECTION -->
+<section class="tracking-hero">
+  <div class="tracking-container">
+    <div class="tracking-title">
+      <h2>🔍 Suivi de votre demande</h2>
+      <p>Consultez en temps réel l'état de votre commande</p>
+    </div>
+    
+    <div class="search-box">
+      <div class="search-input-group">
+        <input type="text" id="trackingInput" placeholder="Entrez votre numéro de demande...">
+        <button class="search-btn" onclick="trackDossier()">Consulter</button>
+      </div>
+    </div>
 
-    <!-- INFORMATIONS CLIENT -->
-    <div style="margin-bottom: 32px;">
-      <h3 class="form-section-title">📋 Vos coordonnées</h3>
-      <div class="form-row">
-        <div>
-          <label for="nom" class="required">Nom complet / Raison Sociale</label>
-          <input type="text" id="nom" required>
+    <!-- DASHBOARD TRACKING -->
+    <div class="dashboard" id="clientDashboard">
+      <div class="dashboard-header">
+        <h3>📊 Détails de votre demande</h3>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-card-label">👤 Client</div>
+          <div class="info-card-value" id="dashClient">-</div>
+          <div class="info-card-desc" id="dashContact">-</div>
         </div>
-        <div>
-          <label for="email" class="required">Adresse Email</label>
-          <input type="email" id="email" required>
+        <div class="info-card">
+          <div class="info-card-label">🚗 Véhicule</div>
+          <div class="info-card-value" id="dashVehicule">-</div>
+          <div class="info-card-desc" id="dashAnnee">-</div>
         </div>
-        <div>
-          <label for="telephone" class="required">Téléphone</label>
-          <input type="tel" id="telephone" required>
+        <div class="info-card">
+          <div class="info-card-label">📦 Pièces</div>
+          <div class="info-card-value" id="dashNbPieces">0</div>
+          <div class="info-card-desc" id="dashUrgence">-</div>
+        </div>
+      </div>
+
+      <!-- TIMELINE -->
+      <div class="timeline-section">
+        <h3 class="timeline-title">📈 Progression du dossier</h3>
+        <div class="timeline">
+          <div class="timeline-item active">
+            <div class="timeline-content">
+              <div class="timeline-number">1</div>
+              <div class="timeline-title-text">✓ Demande Reçue</div>
+              <div class="timeline-desc" id="statusDevis1">Votre demande enregistrée</div>
+              <div class="timeline-date" id="dateDevis" style="font-size:12px; color:#999; margin-top:10px;">-</div>
+              <span class="status-badge badge-success" id="badgeDevis">CONFIRMÉE</span>
+            </div>
+          </div>
+
+          <div class="timeline-item" id="timelineAnalyse">
+            <div class="timeline-content">
+              <div class="timeline-number">2</div>
+              <div class="timeline-title-text">Analyse</div>
+              <div class="timeline-desc">Étude de votre demande</div>
+              <div class="timeline-date" id="dateAnalyse" style="font-size:12px; color:#999; margin-top:10px;">-</div>
+              <span class="status-badge badge-process" id="badgeAnalyse">EN COURS</span>
+            </div>
+          </div>
+
+          <div class="timeline-item" id="timelineDevisPropose">
+            <div class="timeline-content">
+              <div class="timeline-number">3</div>
+              <div class="timeline-title-text">Devis Envoyé</div>
+              <div class="timeline-desc">Proposition commerciale</div>
+              <div class="timeline-date" id="dateDevisPropose" style="font-size:12px; color:#999; margin-top:10px;">-</div>
+              <span class="status-badge badge-pending" id="badgeDevisPropose">ATTENTE</span>
+            </div>
+          </div>
+
+          <div class="timeline-item" id="timelineCommande">
+            <div class="timeline-content">
+              <div class="timeline-number">4</div>
+              <div class="timeline-title-text">Commande Confirmée</div>
+              <div class="timeline-desc">Pièces validées</div>
+              <div class="timeline-date" id="dateCommande" style="font-size:12px; color:#999; margin-top:10px;">-</div>
+              <span class="status-badge badge-pending" id="badgeCommande">ATTENTE</span>
+            </div>
+          </div>
+
+          <div class="timeline-item" id="timelinePrepare">
+            <div class="timeline-content">
+              <div class="timeline-number">5</div>
+              <div class="timeline-title-text">Préparation</div>
+              <div class="timeline-desc">Pièces emballées</div>
+              <div class="timeline-date" id="datePrepare" style="font-size:12px; color:#999; margin-top:10px;">-</div>
+              <span class="status-badge badge-pending" id="badgePrepare">ATTENTE</span>
+            </div>
+          </div>
+
+          <div class="timeline-item" id="timelineShipped">
+            <div class="timeline-content">
+              <div class="timeline-number">6</div>
+              <div class="timeline-title-text">🚚 Expédition</div>
+              <div class="timeline-desc">Colis en route</div>
+              <div class="timeline-date" id="dateShipped" style="font-size:12px; color:#999; margin-top:10px;">-</div>
+              <span class="status-badge badge-shipped" id="badgeShipped">ATTENTE</span>
+            </div>
+          </div>
+
+          <div class="timeline-item" id="timelineDelivery">
+            <div class="timeline-content">
+              <div class="timeline-number">7</div>
+              <div class="timeline-title-text">✓ Livré</div>
+              <div class="timeline-desc">Colis reçu</div>
+              <div class="timeline-date" id="dateDelivery" style="font-size:12px; color:#999; margin-top:10px;">-</div>
+              <span class="status-badge badge-pending" id="badgeDelivery">ATTENTE</span>
+            </div>
+          </div>
+
+          <div class="timeline-item" id="timelineInvoice">
+            <div class="timeline-content">
+              <div class="timeline-number">8</div>
+              <div class="timeline-title-text">💳 Facture</div>
+              <div class="timeline-desc">Paiement et suivi</div>
+              <div class="timeline-date" id="dateInvoice" style="font-size:12px; color:#999; margin-top:10px;">-</div>
+              <span class="status-badge badge-pending" id="badgeInvoice">ATTENTE</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- INFORMATIONS VÉHICULE -->
-    <div style="margin-bottom: 32px;">
-      <h3 class="form-section-title">🚗 Identification du véhicule</h3>
-      <div class="form-row">
-        <div>
-          <label for="marque" class="required">Marque</label>
-          <input type="text" id="marque" placeholder="ex: Volkswagen" required>
-        </div>
-        <div>
-          <label for="modele" class="required">Modèle</label>
-          <input type="text" id="modele" placeholder="ex: Golf 8" required>
-        </div>
-        <div>
-          <label for="annee" class="required">Année</label>
-          <input type="number" id="annee" min="1990" max="2050" placeholder="ex: 2022" required>
-        </div>
-        <div>
-          <label for="kilometrage">Kilométrage</label>
-          <input type="number" id="kilometrage" placeholder="ex: 85000">
+  </div>
+</section>
+
+<!-- FORM SECTION -->
+<section class="form-section">
+  <div class="container">
+    <h2 class="section-title">Faire une demande</h2>
+    <p class="section-subtitle">Remplissez le formulaire ci-dessous pour obtenir un devis personnalisé</p>
+
+    <form id="demandeForm" class="form-card" onsubmit="return submitDemande(event)">
+      
+      <!-- INFOS CLIENT -->
+      <div style="margin-bottom: 40px;">
+        <div class="form-group-title">📋 Vos informations</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="required">Nom complet</label>
+            <input type="text" id="nom" required>
+          </div>
+          <div class="form-group">
+            <label class="required">Email</label>
+            <input type="email" id="email" required>
+          </div>
+          <div class="form-group">
+            <label class="required">Téléphone</label>
+            <input type="tel" id="telephone" required>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- PIÈCES DEMANDÉES -->
-    <div class="pieces-section">
-      <h3 style="font-size: 15px; margin-bottom: 16px; color: var(--dark);">🔧 Liste des pièces recherchées</h3>
-      <div id="piecesContainer">
-        <div class="piece-row" data-piece-id="1">
-          <div>
-            <label class="required">Désignation</label>
-            <input type="text" class="piece-des" placeholder="ex: Filtre à huile" required>
+      <!-- INFOS VEHICULE -->
+      <div style="margin-bottom: 40px;">
+        <div class="form-group-title">🚗 Véhicule</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="required">Marque</label>
+            <input type="text" id="marque" placeholder="Volkswagen" required>
           </div>
-          <div>
-            <label>Référence (Optionnel)</label>
-            <input type="text" class="piece-ref" placeholder="OEM / Réf constructeur">
+          <div class="form-group">
+            <label class="required">Modèle</label>
+            <input type="text" id="modele" placeholder="Golf 8" required>
           </div>
-          <div>
-            <label class="required">Quantité</label>
+          <div class="form-group">
+            <label class="required">Année</label>
+            <input type="number" id="annee" min="1990" max="2050" placeholder="2022" required>
+          </div>
+          <div class="form-group">
+            <label>Kilométrage</label>
+            <input type="number" id="kilometrage" placeholder="85000">
+          </div>
+        </div>
+      </div>
+
+      <!-- PIECES -->
+      <div class="pieces-section">
+        <div class="form-group-title" style="border-bottom: none; margin-bottom: 20px;">🔧 Pièces demandées</div>
+        <div id="piecesContainer">
+          <div class="piece-row" data-piece-id="1">
+            <input type="text" class="piece-des" placeholder="Désignation" required>
+            <input type="text" class="piece-ref" placeholder="Référence OEM">
             <input type="number" class="piece-qte" value="1" min="1" required>
-          </div>
-          <div>
-            <label>Priorité</label>
             <select class="piece-urg">
               <option value="Normal">Normal</option>
               <option value="Urgent">Urgent ⚡</option>
             </select>
+            <button type="button" class="btn-remove" onclick="removePiece(this)" style="opacity:0; pointer-events:none;">✕</button>
           </div>
-          <button type="button" class="btn-remove" onclick="removePiece(this)" style="opacity: 0; pointer-events: none;">✕</button>
+        </div>
+        <button type="button" class="btn-add-piece" onclick="addPiece()">+ Ajouter pièce</button>
+      </div>
+
+      <!-- FILES -->
+      <div class="files-section">
+        <h4 style="margin-bottom: 15px; color: var(--accent); font-size: 18px;">📸 Documents (Optionnel)</h4>
+        <p style="color: var(--gray-500); margin-bottom: 20px;">Carte grise, photos, etc.</p>
+        <input type="file" id="fileInput" multiple accept="image/*,.pdf" style="display:none;" onchange="handleFileSelect(event)">
+        <button type="button" class="file-upload-btn" onclick="document.getElementById('fileInput').click()">📁 Choisir fichiers</button>
+        <div class="files-list" id="filesList"></div>
+      </div>
+
+      <!-- MESSAGE -->
+      <div style="margin-bottom: 40px;">
+        <div class="form-group">
+          <label>Message supplémentaire</label>
+          <textarea id="message" placeholder="Informations utiles..."></textarea>
         </div>
       </div>
-      <button type="button" class="btn-add-piece" onclick="addPiece()">+ Ajouter une autre pièce</button>
+
+      <!-- ACTIONS -->
+      <div class="actions">
+        <button type="reset" class="btn btn-outline">Annuler</button>
+        <button type="submit" class="btn btn-primary">📤 Envoyer demande</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- MODAL -->
+<div class="modal" id="confirmation">
+  <div class="modal-content">
+    <div class="modal-icon">🎉</div>
+    <h2 class="modal-title">Demande reçue!</h2>
+    <p style="color: var(--gray-500); margin-bottom: 20px;">Voici votre numéro de suivi :</p>
+    <div class="modal-number" id="numDemande">-</div>
+    <p style="color: var(--gray-500); font-size: 14px;">Gardez ce numéro pour suivre votre commande</p>
+    <div class="modal-buttons">
+      <button class="btn btn-outline" id="btnEmailAutop">✉️ Email</button>
+      <button class="btn btn-outline" id="btnWhats1">💬 WhatsApp</button>
+      <button class="btn btn-primary" onclick="nouvelleDemande()" style="flex: 2;">➕ Nouvelle demande</button>
     </div>
-
-    <!-- PIÈCES JOINTES -->
-    <div class="files-section">
-      <h3 style="font-size: 16px; color: var(--dark); margin-bottom: 8px;">📸 Carte grise ou Photos des pièces</h3>
-      <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">Ajoutez des documents clairs pour éviter toute erreur de référence.</p>
-      <input type="file" id="fileInput" multiple accept="image/*,.pdf" style="display: none;" onchange="handleFileSelect(event)">
-      <button type="button" class="file-upload-btn" onclick="document.getElementById('fileInput').click()">📁 Sélectionner des fichiers</button>
-      <div class="files-list" id="filesList" style="margin-top: 12px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;"></div>
-    </div>
-
-    <!-- MESSAGE -->
-    <div style="margin-bottom: 32px;">
-      <label for="message">Notes complémentaires / Numéro de Châssis (VIN)</label>
-      <textarea id="message" rows="3" placeholder="Précisez ici toute information utile (Motorisation, Version...)"></textarea>
-    </div>
-
-    <!-- ACTIONS -->
-    <div class="actions">
-      <button type="reset" class="btn btn-outline">Réinitialiser</button>
-      <button type="submit" class="btn btn-primary">📤 Envoyer ma demande de devis</button>
-    </div>
-  </form>
-</div>
-
-<!-- MODAL CONFIRMATION -->
-<div class="confirmation" id="confirmation">
-  <div class="confirmation-content">
-    <div style="font-size: 40px; margin-bottom: 16px;">🎯</div>
-    <h2>Demande enregistrée !</h2>
-    <p style="color: var(--text-muted); margin-top: 8px;">Voici votre numéro de dossier unique pour le suivi en ligne :</p>
-    <div class="num" id="numDemande">-</div>
-    <p style="font-size: 14px; margin-bottom: 20px;">Conservez-le précieusement. Nos équipes étudient votre dossier.</p>
-
-    <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 24px;">
-      <button class="btn btn-outline" id="btnEmailAutop" style="padding: 10px 16px; font-size: 13px;">✉️ Transmettre par Mail</button>
-      <button class="btn btn-outline" id="btnWhats1" style="padding: 10px 16px; font-size: 13px;">💬 WhatsApp</button>
-    </div>
-
-    <button class="btn btn-primary" style="width: 100%;" onclick="nouvelleDemande()">Créer une nouvelle demande</button>
   </div>
 </div>
 
-<footer class="footer">
-  <p>© 2026 AUTOP Premium — Comptoir de distribution de pièces automobiles.</p>
-  <div class="footer-links" style="margin-top: 12px;">
-    <a href="mailto:comptoir.distribution@autop.tn">Contact Mail</a> | 
-    <a href="admin.html">Portail d'administration</a>
-  </div>
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 AUTOP Premium | <a href="mailto:comptoir.distribution@autop.tn">Contact</a> | <a href="admin.html">Admin</a></p>
 </footer>
 
 <div class="toast" id="toast"></div>
@@ -854,14 +1100,13 @@ function showToast(msg, type = 'success') {
 }
 
 function handleFileSelect(e) {
-  const files = Array.from(e.target.files);
-  files.forEach(file => {
+  Array.from(e.target.files).forEach(file => {
     if(file.size > 5 * 1024 * 1024) {
-      showToast(`Fichier ${file.name} trop lourd (max 5Mo)`, 'error');
+      showToast(`${file.name} trop volumineux`, 'error');
       return;
     }
     const reader = new FileReader();
-    reader.onload = function(evt) {
+    reader.onload = evt => {
       uploadedFiles.push({ name: file.name, data: evt.target.result });
       renderFiles();
     };
@@ -873,9 +1118,10 @@ function handleFileSelect(e) {
 function renderFiles() {
   const list = document.getElementById('filesList');
   list.innerHTML = uploadedFiles.map((f, i) => `
-    <span style="background:#e2e8f0; padding:4px 10px; border-radius:6px; font-size:12px; display:inline-flex; align-items:center; gap:6px;">
-      ${f.name.substring(0,15)}... <b style="cursor:pointer; color:red;" onclick="removeFile(${i})">✕</b>
-    </span>
+    <div class="file-item">
+      📄 ${f.name.substring(0,20)}...
+      <span class="file-remove" onclick="removeFile(${i})">✕</span>
+    </div>
   `).join('');
 }
 
@@ -885,15 +1131,13 @@ function addPiece() {
   pieceCount++;
   const html = `
     <div class="piece-row" data-piece-id="${pieceCount}">
-      <div><input type="text" class="piece-des" placeholder="Désignation" required></div>
-      <div><input type="text" class="piece-ref" placeholder="OEM"></div>
-      <div><input type="number" class="piece-qte" value="1" min="1" required></div>
-      <div>
-        <select class="piece-urg">
-          <option value="Normal">Normal</option>
-          <option value="Urgent">Urgent ⚡</option>
-        </select>
-      </div>
+      <input type="text" class="piece-des" placeholder="Désignation" required>
+      <input type="text" class="piece-ref" placeholder="OEM">
+      <input type="number" class="piece-qte" value="1" min="1" required>
+      <select class="piece-urg">
+        <option value="Normal">Normal</option>
+        <option value="Urgent">Urgent ⚡</option>
+      </select>
       <button type="button" class="btn-remove" onclick="removePiece(this)">✕</button>
     </div>
   `;
@@ -907,17 +1151,15 @@ function updateRemoveButtons() {
   const rows = document.querySelectorAll('.piece-row');
   rows.forEach(row => {
     const btn = row.querySelector('.btn-remove');
-    if(!btn) return;
     btn.style.opacity = rows.length === 1 ? '0' : '1';
     btn.style.pointerEvents = rows.length === 1 ? 'none' : 'auto';
   });
 }
 
-/* SUIVI CLIENT COMPLET : DEMANDE -> DEVIS -> COMMANDE -> LIVRAISON -> FACTURE */
 function trackDossier() {
   const num = document.getElementById('trackingInput').value.trim();
   if (!num) {
-    showToast('Veuillez saisir un numéro de demande', 'error');
+    showToast('Entrez un numéro de demande', 'error');
     return;
   }
 
@@ -925,27 +1167,24 @@ function trackDossier() {
   const demande = demandes.find(d => d.num === num);
 
   if (!demande) {
-    showToast('Numéro introuvable dans le système.', 'error');
+    showToast('Numéro introuvable', 'error');
     document.getElementById('clientDashboard').classList.remove('show');
     return;
   }
 
-  // Affichage des informations client
   document.getElementById('dashClient').textContent = demande.client;
   document.getElementById('dashContact').textContent = `${demande.email} | ${demande.telephone}`;
   document.getElementById('dashVehicule').textContent = demande.vehicule;
   document.getElementById('dashAnnee').textContent = `Année: ${demande.annee}`;
   document.getElementById('dashNbPieces').textContent = demande.pieces.length;
   const urgentes = demande.pieces.filter(p => p.urg === 'Urgent').length;
-  document.getElementById('dashUrgence').textContent = urgentes > 0 ? `${urgentes} pièce(s) urgente(s)` : 'Toutes normales';
+  document.getElementById('dashUrgence').textContent = urgentes > 0 ? `${urgentes} urgente(s)` : 'Toutes normales';
 
-  // 1. DEMANDE DE DEVIS (TOUJOURS ACTIVE - étape 1)
   const dateDevis = new Date(demande.timestamp);
-  document.getElementById('dateDevis').textContent = dateDevis.toLocaleDateString('fr-FR') + ' à ' + dateDevis.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+  document.getElementById('dateDevis').textContent = dateDevis.toLocaleDateString('fr-FR');
 
-  // 2. ANALYSE (Simulation: 3-4 heures après demande)
   const dateAnalyse = new Date(dateDevis.getTime() + 3 * 60 * 60 * 1000);
-  document.getElementById('dateAnalyse').textContent = dateAnalyse.toLocaleDateString('fr-FR') + ' à ' + dateAnalyse.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+  document.getElementById('dateAnalyse').textContent = dateAnalyse.toLocaleDateString('fr-FR');
   
   if (demande.statut === 'Analysée') {
     document.getElementById('timelineAnalyse').classList.add('active');
@@ -953,33 +1192,23 @@ function trackDossier() {
     document.getElementById('badgeAnalyse').textContent = 'COMPLÉTÉE';
   }
 
-  // 3. DEVIS PROPOSÉ (Simulation: 5-6 heures après demande)
   const dateDevisPropose = new Date(dateDevis.getTime() + 5 * 60 * 60 * 1000);
-  document.getElementById('dateDevisPropose').textContent = dateDevisPropose.toLocaleDateString('fr-FR') + ' à ' + dateDevisPropose.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+  document.getElementById('dateDevisPropose').textContent = dateDevisPropose.toLocaleDateString('fr-FR');
   
   if (demande.statut === 'Devis Proposé' || demande.statut === 'Devis Accepté') {
     document.getElementById('timelineDevisPropose').classList.add('active');
     document.getElementById('badgeDevisPropose').className = demande.statut === 'Devis Accepté' ? 'status-badge badge-success' : 'status-badge badge-process';
     document.getElementById('badgeDevisPropose').textContent = demande.statut === 'Devis Accepté' ? 'VALIDÉ' : 'EN ATTENTE';
-    document.getElementById('invoiceContainer1').innerHTML = '<a href="#" class="doc-link" onclick="alert(\'Devis PDF disponible à télécharger...\')">📄 Télécharger le Devis PDF</a>';
   }
 
-  // 4. COMMANDE CONFIRMÉE (Si devis accepté)
   if (demande.commandeStatus === 'Confirmée' || demande.commandeStatus === 'En Préparation' || demande.commandeStatus === 'Expédiée') {
     document.getElementById('timelineCommande').classList.add('active');
     const dateCommande = new Date(dateDevisPropose.getTime() + 2 * 60 * 60 * 1000);
     document.getElementById('dateCommande').textContent = dateCommande.toLocaleDateString('fr-FR');
     document.getElementById('badgeCommande').className = 'status-badge badge-success';
     document.getElementById('badgeCommande').textContent = 'CRÉÉE';
-    document.getElementById('orderInfoContainer').innerHTML = `
-      <div style="margin-top:8px; font-size:13px; color:var(--text-muted);">
-        <strong>Commande N°:</strong> CMD-${demande.num.split('-')[1]}<br>
-        <strong>Montant:</strong> ${(demande.pieces.length * 35).toFixed(2)} TND
-      </div>
-    `;
   }
 
-  // 5. PRÉPARATION
   if (demande.commandeStatus === 'En Préparation' || demande.commandeStatus === 'Expédiée') {
     document.getElementById('timelinePrepare').classList.add('active');
     const datePrepare = new Date(dateDevisPropose.getTime() + 12 * 60 * 60 * 1000);
@@ -988,47 +1217,32 @@ function trackDossier() {
     document.getElementById('badgePrepare').textContent = demande.commandeStatus === 'Expédiée' ? 'COMPLÉTÉE' : 'EN COURS';
   }
 
-  // 6. EXPÉDITION
   if (demande.commandeStatus === 'Expédiée') {
     document.getElementById('timelineShipped').classList.add('active');
     const dateShipped = new Date(dateDevisPropose.getTime() + 24 * 60 * 60 * 1000);
     document.getElementById('dateShipped').textContent = dateShipped.toLocaleDateString('fr-FR');
     document.getElementById('badgeShipped').className = 'status-badge badge-shipped';
     document.getElementById('badgeShipped').textContent = 'EN ROUTE';
-    document.getElementById('shippingContainer').innerHTML = `
-      <div style="margin-top:8px; font-size:13px; color:var(--text-muted);">
-        <strong>Transporteur:</strong> STEG LOGISTIQUE<br>
-        <strong>Suivi:</strong> <a href="#" style="color:var(--primary); text-decoration:none;" onclick="alert('Lien de suivi externe...')">TRK#2026070567</a>
-      </div>
-    `;
   }
 
-  // 7. LIVRAISON
   if (demande.deliveryStatus === 'Livrée') {
     document.getElementById('timelineDelivery').classList.add('active');
     const dateDelivery = new Date(dateDevisPropose.getTime() + 48 * 60 * 60 * 1000);
     document.getElementById('dateDelivery').textContent = dateDelivery.toLocaleDateString('fr-FR');
-    document.getElementById('badgeDelivery').className = 'status-badge badge-delivered';
+    document.getElementById('badgeDelivery').className = 'status-badge badge-success';
     document.getElementById('badgeDelivery').textContent = 'LIVRÉE';
   }
 
-  // 8. FACTURE & PAIEMENT
   if (demande.factureStatus === 'En attente' || demande.factureStatus === 'Payée') {
     document.getElementById('timelineInvoice').classList.add('active');
     const dateInvoice = new Date(dateDevisPropose.getTime() + 48 * 60 * 60 * 1000);
     document.getElementById('dateInvoice').textContent = dateInvoice.toLocaleDateString('fr-FR');
     document.getElementById('badgeInvoice').className = demande.factureStatus === 'Payée' ? 'status-badge badge-success' : 'status-badge badge-process';
-    document.getElementById('badgeInvoice').textContent = demande.factureStatus === 'Payée' ? 'PAYÉE' : 'EN ATTENTE PAIEMENT';
-    document.getElementById('invoiceContainer2').innerHTML = `
-      <div style="margin-top:8px; font-size:13px; color:var(--text-muted);">
-        <strong>Facture N°:</strong> FAC-${demande.num.split('-')[1]}<br>
-        <a href="#" class="doc-link" onclick="alert(\'Facture PDF disponible...\')">📄 Télécharger la Facture PDF</a>
-      </div>
-    `;
+    document.getElementById('badgeInvoice').textContent = demande.factureStatus === 'Payée' ? 'PAYÉE' : 'ATTENTE PAIEMENT';
   }
 
   document.getElementById('clientDashboard').classList.add('show');
-  showToast('Dossier client chargé avec succès! ✓', 'success');
+  showToast('Dossier chargé ✓', 'success');
 }
 
 function submitDemande(e) {
@@ -1039,20 +1253,17 @@ function submitDemande(e) {
   const pieces = [];
   document.querySelectorAll('.piece-row').forEach(row => {
     const des = row.querySelector('.piece-des').value;
-    if (des) {
-      pieces.push({
-        des,
-        ref: row.querySelector('.piece-ref').value,
-        qte: row.querySelector('.piece-qte').value,
-        urg: row.querySelector('.piece-urg').value
-      });
-    }
+    if (des) pieces.push({
+      des,
+      ref: row.querySelector('.piece-ref').value,
+      qte: row.querySelector('.piece-qte').value,
+      urg: row.querySelector('.piece-urg').value
+    });
   });
 
   const demande = {
     num: num,
     date: now.toLocaleDateString('fr-FR'),
-    heure: now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}),
     timestamp: now.toISOString(),
     client: document.getElementById('nom').value,
     email: document.getElementById('email').value,
@@ -1060,11 +1271,9 @@ function submitDemande(e) {
     vehicule: document.getElementById('marque').value + ' ' + document.getElementById('modele').value,
     annee: document.getElementById('annee').value,
     pieces: pieces,
-    files: uploadedFiles,
-    message: document.getElementById('message').value,
     statut: 'Analysée',
     commandeStatus: 'Confirmée',
-    factureStatus: 'En attente de paiement',
+    factureStatus: 'En attente',
     deliveryStatus: 'Expédiée'
   };
 
@@ -1075,18 +1284,17 @@ function submitDemande(e) {
   document.getElementById('numDemande').textContent = num;
   document.getElementById('demandeForm').style.display = 'none';
   document.getElementById('confirmation').classList.add('show');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
   setupConfirmationActions(demande);
   return false;
 }
 
 function setupConfirmationActions(demande) {
-  const bodyText = `🔔 NOUVELLE DEMANDE : ${demande.num}\nClient: ${demande.client}\nVéhicule: ${demande.vehicule}\nPièces: ${demande.pieces.length} article(s).\n\nConsultez le suivi sur : https://autop.tn avec le numéro: ${demande.num}`;
+  const msg = `Demande ${demande.num}\nClient: ${demande.client}\nVéhicule: ${demande.vehicule}\n${demande.pieces.length} pièce(s)`;
   document.getElementById('btnEmailAutop').onclick = () => {
-    window.open(`mailto:comptoir.distribution@autop.tn?subject=Demande ${demande.num}&body=${encodeURIComponent(bodyText)}`);
+    window.open(`mailto:comptoir.distribution@autop.tn?subject=Demande ${demande.num}&body=${encodeURIComponent(msg)}`);
   };
   document.getElementById('btnWhats1').onclick = () => {
-    window.open(`https://wa.me/21698774525?text=${encodeURIComponent(bodyText)}`);
+    window.open(`https://wa.me/21698774525?text=${encodeURIComponent(msg)}`);
   };
 }
 
@@ -1096,8 +1304,6 @@ function nouvelleDemande() {
   renderFiles();
   document.getElementById('demandeForm').style.display = 'block';
   document.getElementById('confirmation').classList.remove('show');
-  document.getElementById('trackingInput').value = '';
-  document.getElementById('clientDashboard').classList.remove('show');
 }
 
 document.addEventListener('DOMContentLoaded', updateRemoveButtons);
