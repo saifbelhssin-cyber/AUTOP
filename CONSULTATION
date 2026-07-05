@@ -923,23 +923,21 @@ let uploadedFiles = [];
 const MAX_FILES = 10;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
+// File handling
 function handleFileSelect(event) {
   const files = Array.from(event.target.files);
   
-  // Validate number of files
   if (uploadedFiles.length + files.length > MAX_FILES) {
     showToast(`❌ Maximum ${MAX_FILES} fichiers autorisés`, 'error');
     return;
   }
 
-  // Validate file sizes and add files
-  files.forEach((file, index) => {
+  files.forEach((file) => {
     if (file.size > MAX_FILE_SIZE) {
       showToast(`❌ ${file.name}: fichier trop volumineux (max 5 MB)`, 'error');
       return;
     }
 
-    // Convert file to base64 for storage
     const reader = new FileReader();
     reader.onload = function(e) {
       uploadedFiles.push({
@@ -953,14 +951,13 @@ function handleFileSelect(event) {
     reader.readAsDataURL(file);
   });
 
-  // Reset input
   event.target.value = '';
 }
 
 function renderFiles() {
   const list = document.getElementById('filesList');
   list.innerHTML = uploadedFiles.map((file, i) => `
-    <div class="file-item">
+    <div class="file-item" title="${file.name}">
       ${file.name.substring(0, 20)}
       <button type="button" class="file-remove-btn" onclick="removeFile(${i})">✕</button>
     </div>
@@ -972,6 +969,7 @@ function removeFile(index) {
   renderFiles();
 }
 
+// Pieces management
 function addPiece() {
   pieceCount++;
   const html = `
@@ -994,190 +992,206 @@ function addPiece() {
 
 function removePiece(btn) { 
   const row = btn.closest('.piece-row'); 
-  if(row){ row.remove(); updateRemoveButtons(); }
+  if (row) { 
+    row.remove(); 
+    updateRemoveButtons(); 
+  }
 }
 
 function updateRemoveButtons() { 
-  const rows = document.querySelectorAll('.piece-row'); 
-  rows.forEach((row) => { 
-    const btn = row.querySelector('.btn-remove'); 
-    if(!btn) return; 
-    if(rows.length === 1){ 
-      btn.style.opacity = '0'; 
-      btn.style.pointerEvents = 'none'; 
-    } else { 
-      btn.style.opacity = '1'; 
-      btn.style.pointerEvents = 'auto'; 
-    } 
-  }); 
+  const rows = document.querySelectorAll('.piece-row');
+  rows.forEach((row, index) => {
+    const removeBtn = row.querySelector('.btn-remove');
+    if (rows.length > 1) {
+      removeBtn.style.opacity = '1';
+      removeBtn.style.pointerEvents = 'auto';
+    } else {
+      removeBtn.style.opacity = '0';
+      removeBtn.style.pointerEvents = 'none';
+    }
+  });
 }
 
-function showToast(msg, type) { 
-  const t = document.getElementById('toast'); 
-  t.textContent = msg; 
-  t.className = 'toast ' + (type || 'success'); 
-  t.classList.add('show'); 
-  setTimeout(() => t.classList.remove('show'), 3000); 
+// Toast notification
+function showToast(message, type = 'error') {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = `toast ${type} show`;
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
 }
 
-function trackDevis() {
-  const num = document.getElementById('trackingInput').value.trim();
-  if (!num) {
-    showToast('❌ Veuillez entrer un numéro de devis', 'error');
-    return;
-  }
-
-  const demandes = JSON.parse(localStorage.getItem('demandes') || '[]');
-  const demande = demandes.find(d => d.num === num);
-
-  if (!demande) {
-    showToast('❌ Devis introuvable', 'error');
-    document.getElementById('trackingResult').classList.remove('show');
-    return;
-  }
-
-  document.getElementById('resultStatus').textContent = demande.statut || 'En attente';
-  document.getElementById('resultDate').textContent = demande.date;
-  document.getElementById('resultPieces').textContent = (demande.pieces || []).length;
-  document.getElementById('trackingResult').classList.add('show');
-  showToast('✅ Devis trouvé !', 'success');
+// Generate quote number
+function generateQuoteNumber() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const random = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+  return `DEM-${year}${month}${day}-${random}`;
 }
 
-function submitDemande(e) {
-  e.preventDefault();
-  const now = new Date();
-  const num = 'DEM-' + now.toISOString().slice(0,10).replace(/-/g,'') + '-' + String(Math.floor(Math.random()*900)+100).padStart(3,'0');
-  document.getElementById('numDemande').textContent = num;
-
+// Collect form data
+function collectFormData() {
   const pieces = [];
   document.querySelectorAll('.piece-row').forEach(row => {
     const des = row.querySelector('.piece-des').value;
     const ref = row.querySelector('.piece-ref').value;
     const qte = row.querySelector('.piece-qte').value;
     const urg = row.querySelector('.piece-urg').value;
-    if (des) pieces.push({ des, ref, qte, urg });
+    if (des) {
+      pieces.push({ designation: des, reference: ref, quantite: qte, urgence: urg });
+    }
   });
 
-  const demande = {
-    num: num,
-    date: now.toLocaleDateString('fr-FR'),
-    heure: now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}),
-    client: document.getElementById('nom').value,
+  return {
+    numero: generateQuoteNumber(),
+    nom: document.getElementById('nom').value,
     email: document.getElementById('email').value,
     telephone: document.getElementById('telephone').value,
-    vehicule: document.getElementById('marque').value + ' ' + document.getElementById('modele').value,
+    marque: document.getElementById('marque').value,
+    modele: document.getElementById('modele').value,
     annee: document.getElementById('annee').value,
+    kilometrage: document.getElementById('kilometrage').value || 'Non spécifié',
     pieces: pieces,
-    files: uploadedFiles,
     message: document.getElementById('message').value,
-    statut: 'En attente'
+    fichiers: uploadedFiles.length,
+    date: new Date().toLocaleDateString('fr-FR')
   };
+}
 
-  try {
-    const demandes = JSON.parse(localStorage.getItem('demandes') || '[]');
-    demandes.unshift(demande);
-    localStorage.setItem('demandes', JSON.stringify(demandes));
+// Submit form
+function submitDemande(event) {
+  event.preventDefault();
 
-    try {
-      const bc = new BroadcastChannel('demandes_channel');
-      bc.postMessage({ type: 'nouvelle_demande', demande });
-      bc.close();
-    } catch(e) {}
-
-    resetForm();
-    document.getElementById('demandeForm').style.display = 'none';
-    document.getElementById('confirmation').classList.add('show');
-    showToast('✅ Demande envoyée !', 'success');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    setupConfirmationActions(demande);
-  } catch(e) {
-    console.error('Erreur:', e);
-    showToast('❌ Erreur lors de l\'envoi', 'error');
+  const formData = collectFormData();
+  
+  // Validate at least one piece
+  if (formData.pieces.length === 0) {
+    showToast('❌ Veuillez ajouter au moins une pièce', 'error');
+    return false;
   }
+
+  // Save to localStorage for demo
+  const requests = JSON.parse(localStorage.getItem('autop_requests') || '[]');
+  requests.push({
+    ...formData,
+    timestamp: new Date().toISOString()
+  });
+  localStorage.setItem('autop_requests', JSON.stringify(requests));
+
+  // Show confirmation
+  document.getElementById('numDemande').textContent = formData.numero;
+  document.getElementById('confirmation').classList.add('show');
+
+  // Setup buttons in confirmation
+  setupConfirmationButtons(formData);
+
+  // Reset form
+  document.getElementById('demandeForm').reset();
+  uploadedFiles = [];
+  renderFiles();
+  pieceCount = 1;
+
   return false;
 }
 
-function setupConfirmationActions(demande) {
-  const emailBtn = document.getElementById('btnEmailAutop');
-  const waBtn1 = document.getElementById('btnWhats1');
-  const waBtn2 = document.getElementById('btnWhats2');
-  const autopEmail = 'comptoir.distribution@autop.tn';
-  const waNum1 = '+21698774525';
-  const waNum2 = '+21698171411';
-  const subject = encodeURIComponent('Nouvelle demande de devis - ' + demande.num);
-  const bodyLines = [];
-  bodyLines.push('🔔 *NOUVELLE DEMANDE DE DEVIS*');
-  bodyLines.push('');
-  bodyLines.push('📋 *Numéro:* ' + demande.num);
-  bodyLines.push('👤 *Client:* ' + (demande.client || ''));
-  bodyLines.push('📞 *Tel:* ' + (demande.telephone || ''));
-  bodyLines.push('📧 *Email:* ' + (demande.email || ''));
-  bodyLines.push('🚗 *Véhicule:* ' + (demande.vehicule || '') + ' (' + (demande.annee || '') + ')');
-  bodyLines.push('');
-  bodyLines.push('🔧 *Pièces demandées:*');
-  (demande.pieces || []).forEach(p => { 
-    bodyLines.push('  • ' + p.des + ' (qte: ' + p.qte + ', ' + p.urg + ')'); 
-  });
-  if (demande.files && demande.files.length > 0) {
-    bodyLines.push('');
-    bodyLines.push('📎 *Fichiers attachés:* ' + demande.files.length + ' fichier(s)');
+// Setup confirmation buttons
+function setupConfirmationButtons(formData) {
+  const emailBody = formatEmailBody(formData);
+  const whatsappBody = formatWhatsappBody(formData);
+
+  document.getElementById('btnEmailAutop').onclick = () => {
+    window.location.href = `mailto:comptoir.distribution@autop.tn?subject=Demande de devis ${formData.numero}&body=${encodeURIComponent(emailBody)}`;
+  };
+
+  document.getElementById('btnWhats1').onclick = () => {
+    window.open(`https://wa.me/21698774525?text=${encodeURIComponent(whatsappBody)}`, '_blank');
+  };
+
+  document.getElementById('btnWhats2').onclick = () => {
+    window.open(`https://wa.me/21698171411?text=${encodeURIComponent(whatsappBody)}`, '_blank');
+  };
+}
+
+// Format email body
+function formatEmailBody(data) {
+  return `
+Demande de devis - ${data.numero}
+
+CLIENT:
+Nom: ${data.nom}
+Email: ${data.email}
+Téléphone: ${data.telephone}
+
+VÉHICULE:
+Marque: ${data.marque}
+Modèle: ${data.modele}
+Année: ${data.annee}
+Kilométrage: ${data.kilometrage}
+
+PIÈCES DEMANDÉES:
+${data.pieces.map((p, i) => `${i+1}. ${p.designation} (Ref: ${p.reference}, Qté: ${p.quantite}, ${p.urgence})`).join('\n')}
+
+MESSAGE:
+${data.message}
+
+Fichiers joints: ${data.fichiers}
+Date: ${data.date}
+  `.trim();
+}
+
+// Format WhatsApp body
+function formatWhatsappBody(data) {
+  return `📋 *Demande de devis* - ${data.numero}
+
+*CLIENT:*
+${data.nom} | ${data.telephone}
+
+*VÉHICULE:*
+${data.marque} ${data.modele} (${data.annee})
+
+*PIÈCES:*
+${data.pieces.map((p, i) => `${i+1}. ${p.designation} (x${p.quantite})`).join('\n')}
+
+*MESSAGE:* ${data.message}`;
+}
+
+// New request
+function nouvelleDemande() {
+  document.getElementById('confirmation').classList.remove('show');
+  window.scrollTo(0, 0);
+}
+
+// Track quote
+function trackDevis() {
+  const input = document.getElementById('trackingInput').value.trim();
+  if (!input) {
+    showToast('❌ Veuillez entrer un numéro de devis', 'error');
+    return;
   }
-  bodyLines.push('');
-  bodyLines.push('💬 *Message:* ' + (demande.message || 'N/A'));
-  bodyLines.push('');
-  bodyLines.push('⏰ *Date:* ' + demande.date + ' ' + demande.heure);
-  
-  const body = encodeURIComponent(bodyLines.join('\n'));
 
-  emailBtn.onclick = function() { 
-    window.open('mailto:' + autopEmail + '?subject=' + subject + '&body=' + body, '_blank'); 
-    showToast('📧 Ouverture email...', 'success');
-  };
-  waBtn1.onclick = function() { 
-    window.open('https://wa.me/' + waNum1.replace(/\+/g,'') + '?text=' + body, '_blank'); 
-    showToast('💬 Ouverture WhatsApp...', 'success');
-  };
-  waBtn2.onclick = function() { 
-    window.open('https://wa.me/' + waNum2.replace(/\+/g,'') + '?text=' + body, '_blank'); 
-    showToast('💬 Ouverture WhatsApp...', 'success');
-  };
+  const requests = JSON.parse(localStorage.getItem('autop_requests') || '[]');
+  const request = requests.find(r => r.numero === input);
+
+  if (request) {
+    document.getElementById('resultStatus').textContent = 'En traitement';
+    document.getElementById('resultStatus').style.backgroundColor = '#ff9800';
+    document.getElementById('resultStatus').style.color = 'white';
+    document.getElementById('resultDate').textContent = request.date;
+    document.getElementById('resultPieces').textContent = request.pieces.length;
+    document.getElementById('trackingResult').classList.add('show');
+    showToast('✅ Devis trouvé!', 'success');
+  } else {
+    showToast('❌ Numéro de devis non trouvé', 'error');
+    document.getElementById('trackingResult').classList.remove('show');
+  }
 }
 
-function resetForm() { 
-  document.getElementById('demandeForm').reset(); 
-  uploadedFiles = [];
-  document.getElementById('filesList').innerHTML = '';
-  document.getElementById('piecesContainer').innerHTML = `
-    <div class="piece-row" data-piece-id="1">
-      <input type="text" class="piece-des" placeholder="Désignation de la pièce" required>
-      <input type="text" class="piece-ref" placeholder="Référence OEM">
-      <input type="number" class="piece-qte" placeholder="Quantité" value="1" min="1" required>
-      <select class="piece-urg">
-        <option value="Normal">Normal</option>
-        <option value="Urgent">Urgent ⚡</option>
-      </select>
-      <button type="button" class="btn-remove" onclick="removePiece(this)" style="opacity: 0; pointer-events: none;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      </button>
-    </div>
-  `; 
-  pieceCount = 1; 
-  updateRemoveButtons(); 
-}
-
-function nouvelleDemande() { 
-  resetForm(); 
-  document.getElementById('demandeForm').style.display = 'block'; 
-  document.getElementById('confirmation').classList.remove('show'); 
-  window.scrollTo({ top: 0, behavior: 'smooth' }); 
-}
-
-document.addEventListener('DOMContentLoaded', function() { 
-  updateRemoveButtons(); 
-  document.getElementById('trackingInput').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') trackDevis();
-  });
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  updateRemoveButtons();
 });
 </script>
 
